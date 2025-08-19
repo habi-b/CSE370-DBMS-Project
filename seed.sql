@@ -1,10 +1,3 @@
-USE panda_bank;
-
--- =============================
--- 1) USERS (18 total)
--- Users 1-9: heavy demo users
--- Users 10-18: fresh customers (minimal)
--- =============================
 INSERT INTO users (full_name, email, password, phone_number, created_at) VALUES
 -- Users 1-9 (full dataset)
 ('Anika Tabassum',     'anika.tabassum@example.com',     'password1',  '01711110001', '2024-09-01 09:00:00'),
@@ -28,12 +21,7 @@ INSERT INTO users (full_name, email, password, phone_number, created_at) VALUES
 ('Rafiq Islam',        'rafiq.islam@example.com',        'password17', '01711110017', '2025-01-12 12:10:00'),
 ('Salma Begum',        'salma.begum@example.com',        'password18', '01711110018', '2025-01-13 12:20:00');
 
--- =============================
--- 2) ACCOUNTS (2 per user)
--- We insert in order so account_id mapping is predictable:
--- User 1 -> account_id 1 & 2, User 2 -> 3 & 4, ... User 18 -> 35 & 36
--- account_number is a readable mock (not real)
--- =============================
+
 INSERT INTO accounts (user_id, account_type, account_number, balance, created_at) VALUES
 -- User 1
 (1, 'Checking', 'ACCT-10000001', 45000.00, '2024-09-01 09:05:00'),
@@ -62,7 +50,7 @@ INSERT INTO accounts (user_id, account_type, account_number, balance, created_at
 -- User 9
 (9, 'Checking', 'ACCT-10000009', 35000.00, '2024-09-09 10:25:00'),
 (9, 'Savings',  'ACCT-20000009', 75000.00, '2024-09-09 10:26:00'),
--- Users 10-18 (fresh customers with small opening balances)
+-- Users 10-18
 (10, 'Checking', 'ACCT-10000010', 8000.00, '2025-01-05 11:05:00'),
 (10, 'Savings',  'ACCT-20000010', 2000.00, '2025-01-05 11:06:00'),
 (11, 'Checking', 'ACCT-10000011', 7500.00, '2025-01-06 11:15:00'),
@@ -82,14 +70,6 @@ INSERT INTO accounts (user_id, account_type, account_number, balance, created_at
 (18, 'Checking', 'ACCT-10000018', 6500.00, '2025-01-13 12:25:00'),
 (18, 'Savings',  'ACCT-20000018', 2200.00, '2025-01-13 12:26:00');
 
--- =============================
--- 3) TRANSACTIONS (Users 1–9; accounts 1..18)
--- ~15 entries per account (mixture of credits/debits)
--- transaction_type uses enum ('Credit','Debit') per schema
--- Note: amounts are always positive; transaction_type indicates direction
--- =============================
--- For brevity and clarity we group by account_id
--- Account 1 (User 1 - Checking)
 INSERT INTO transactions (account_id, transaction_date, description, amount, transaction_type) VALUES
 (1, '2025-07-01 10:15:00', 'Salary - August', 50000.00, 'Credit'),
 (1, '2025-07-02 14:30:00', 'Daraz Purchase - Electronics', 2500.00, 'Debit'),
@@ -413,10 +393,7 @@ INSERT INTO transactions (account_id, transaction_date, description, amount, tra
 (18, '2024-08-11 08:25:00', 'Interest Credit', 100.00, 'Credit'),
 (18, '2024-07-01 09:00:00', 'Initial Deposit', 2500.00, 'Credit');
 
--- =============================
--- 4) GOALS (Users 1–9)
--- 1-2 goals per heavy user with progress
--- =============================
+
 INSERT INTO goals (user_id, title, target_amount, current_amount, created_at) VALUES
 (1, 'Hajj Fund', 450000.00, 75000.00, '2024-10-01 10:00:00'),
 (1, 'New Mobile Phone', 35000.00, 5000.00, '2025-01-15 09:00:00'),
@@ -445,10 +422,7 @@ INSERT INTO goals (user_id, title, target_amount, current_amount, created_at) VA
 (9, 'Home Appliance Upgrade', 100000.00, 25000.00, '2024-10-25 08:30:00'),
 (9, 'New Mobile Phone', 30000.00, 6000.00, '2025-03-01 10:00:00');
 
--- =============================
--- 5) BENEFICIARIES (Users 1–9)
--- beneficiary_id is auto-incremented. The IDs will be 1, 2, 3, etc.
--- =============================
+
 INSERT INTO beneficiaries (user_id, beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes) VALUES
 -- User 1 (Anika)
 (1, 'Rahim Uddin', 'ACCT-10000002', 'Panda Bank', 'Family', 'Uncle Rahim', 'Monthly family support'),
@@ -493,9 +467,7 @@ INSERT INTO beneficiaries (user_id, beneficiary_name, beneficiary_account_number
 (9, 'Shamima Sultana', 'ACCT-10000005', 'Other Bank', 'Business', 'SS Corp', 'Corporate account'),
 (9, 'Tanvir Hossain', 'ACCT-10000006', 'Panda Bank', 'Friend', 'Tanvir', NULL);
 
--- =============================
--- 13) SCHEDULED TRANSFERS (Users 1-9)
--- =============================
+
 INSERT INTO scheduled_transfers (user_id, from_account_id, beneficiary_id, amount, frequency, start_date, end_date, status, notes) VALUES
 -- User 1 (Anika) - Checking account_id: 1
 (1, 1, 1, 5000.00, 'Monthly', '2025-09-15', NULL, 'Active', 'Monthly family support to Uncle Rahim'),
@@ -527,10 +499,7 @@ INSERT INTO scheduled_transfers (user_id, from_account_id, beneficiary_id, amoun
 
 -- User 9 (Abdul) - Checking account_id: 17
 (9, 17, 24, 75000.00, 'One-time', '2025-09-28', NULL, 'Active', 'Invoice payment to SS Corp');
--- =============================
--- 6) CARDS (Users 1–9)
--- Mix of Debit/Credit, varied limits and statuses
--- =============================
+
 INSERT INTO cards (user_id, card_number, card_type, status, spending_limit) VALUES
 (1, '4111111111111234', 'Debit', 'Active', 100000.00),
 (1, '5500000000009876', 'Credit', 'Active', 150000.00),
@@ -551,9 +520,7 @@ INSERT INTO cards (user_id, card_number, card_type, status, spending_limit) VALU
 (9, '4111111111114455', 'Debit', 'Active', 85000.00),
 (9, '5500000000006677', 'Credit', 'Active', 130000.00);
 
--- =============================
--- 7) BILLS (Users 1–9) - UPDATED with paid_on date
--- =============================
+
 INSERT INTO bills (user_id, bill_name, amount, due_date, status, paid_on) VALUES
 -- User 1
 (1, 'DESCO Electricity', 1200.00, '2025-08-25', 'Pending', NULL),
@@ -593,10 +560,7 @@ INSERT INTO bills (user_id, bill_name, amount, due_date, status, paid_on) VALUES
 (9, 'DESCO Electricity', 1250.00, '2025-08-20', 'Paid', '2025-08-18'),
 (9, 'Titas Gas', 900.00, '2025-08-25', 'Pending', NULL);
 
--- =============================
--- 8) LOANS (Users 1–9)
--- Various statuses for demo
--- =============================
+
 INSERT INTO loans (user_id, amount_requested, purpose, term_in_months, status, created_at) VALUES
 (1, 150000.00, 'Home Renovation', 24, 'Approved', '2025-02-10 10:00:00'),
 (1, 50000.00,  'Education', 12, 'Pending', '2025-05-01 12:00:00'),
@@ -621,10 +585,7 @@ INSERT INTO loans (user_id, amount_requested, purpose, term_in_months, status, c
 
 (9, 300000.00, 'Home Renovation', 24, 'Pending', '2025-03-30 12:00:00');
 
--- =============================
--- 9) WALLETS (Users 1–9)
--- Multi-currency demo balances
--- =============================
+
 INSERT INTO wallets (user_id, currency_code, balance) VALUES
 (1, 'BDT', 85000.00), (1, 'USD', 500.00), (1, 'EUR', 300.00),
 (2, 'BDT', 120000.00),(2, 'USD', 1000.00),(2, 'GBP', 200.00),
@@ -636,10 +597,7 @@ INSERT INTO wallets (user_id, currency_code, balance) VALUES
 (8, 'BDT', 130000.00),(8, 'USD', 650.00), (8, 'GBP', 300.00),
 (9, 'BDT', 48000.00), (9, 'EUR', 400.00), (9, 'USD', 500.00);
 
--- =============================
--- 10) TICKETS (Users 1–9)
--- Support tickets with statuses
--- =============================
+
 INSERT INTO tickets (user_id, subject, status, created_at) VALUES
 (1, 'Unable to log in on mobile app', 'Open', '2025-08-05 10:00:00'),
 (1, 'Query about loan application', 'Closed', '2025-08-03 15:30:00'),
@@ -652,9 +610,7 @@ INSERT INTO tickets (user_id, subject, status, created_at) VALUES
 (8, 'Need statement for visa application', 'Open', '2025-08-08 12:25:00'),
 (9, 'Suspicious login detected', 'Open', '2025-08-06 17:10:00');
 
--- =============================
--- 11) TICKET MESSAGES (for the tickets above)
--- =============================
+
 INSERT INTO ticket_messages (ticket_id, sender, message_text, sent_at) VALUES
 -- Ticket 1 (ticket_id 1)
 (1, 'User', 'I can’t log into the mobile app since yesterday.', '2025-08-05 10:05:00'),
@@ -693,13 +649,9 @@ INSERT INTO ticket_messages (ticket_id, sender, message_text, sent_at) VALUES
 (9, 'User', 'I need my last 6 months statement for visa purposes.', '2025-08-08 12:30:00'),
 (9, 'Support', 'Statement emailed to your registered address.', '2025-08-08 12:50:00'),
 
--- Extra message for ticket 10 example (ticket_id 10 might not exist if only 9 tickets; safe to omit)
 (10, 'User', 'I got an alert about suspicious login.', '2025-08-06 17:15:00');
 
--- =============================
--- 12) ACTIVITY LOG (Users 1–9)
--- Realistic audit trail entries for demo
--- =============================
+
 INSERT INTO activity_log (user_id, action, device_info, ip_address, timestamp) VALUES
 (1, 'Login from new IP', 'Chrome on Android', '103.120.56.12', '2025-08-05 09:15:00'),
 (1, 'Beneficiary Added', 'Web portal', '103.120.56.12', '2025-08-05 09:17:00'),
@@ -736,3 +688,4 @@ INSERT INTO activity_log (user_id, action, device_info, ip_address, timestamp) V
 (9, 'Login from new IP', 'Firefox on Mac', '103.90.12.23', '2025-08-07 07:50:00'),
 (9, 'Beneficiary Added', 'Web portal', '103.90.12.23', '2025-08-07 08:00:00'),
 (9, 'Money Transfer to Imran Khan', 'Web portal', '103.90.12.23', '2025-08-07 08:15:00');
+
