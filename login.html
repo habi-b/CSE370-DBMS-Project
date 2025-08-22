@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Secure Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .bank-name {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .register-field {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, margin-bottom 0.5s ease-in-out;
+            margin-bottom: 0;
+        }
+
+        .register-field.show {
+            max-height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(238, 90, 36, 0.4);
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .toggle-link:hover {
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="bank-logo">🐼</div>
+            <h1 class="bank-name" id="formTitle">Panda Bank</h1>
+        </div>
+
+        <form id="authForm">
+            <div class="form-group register-field" id="fullNameGroup">
+                <label class="form-label" for="fullName">Full Name</label>
+                <input type="text" id="fullName" class="form-input" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group register-field" id="phoneGroup">
+                <label class="form-label" for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" class="form-input" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="Enter your email address" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="submit-button" id="submitBtn">
+                <span class="button-text">Sign In</span>
+            </button>
+        </form>
+
+        <div class="toggle-form">
+            <span style="color: rgba(255,255,255,0.7); font-size: 14px;" id="toggleText">Don't have an account? </span>
+            <a class="toggle-link" id="toggleLink">Create one</a>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+        const API_BASE_URL = 'http://localhost:3000/api/auth';
+
+        const formTitle = document.getElementById('formTitle');
+        const fullNameGroup = document.getElementById('fullNameGroup');
+        const phoneGroup = document.getElementById('phoneGroup');
+        const submitBtn = document.getElementById('submitBtn');
+        const buttonText = submitBtn.querySelector('.button-text');
+        const toggleText = document.getElementById('toggleText');
+        const toggleLink = document.getElementById('toggleLink');
+        const authForm = document.getElementById('authForm');
+
+        toggleLink.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            updateFormMode();
+        });
+
+        function updateFormMode() {
+            if (isLoginMode) {
+                formTitle.textContent = 'Panda Bank';
+                fullNameGroup.classList.remove('show');
+                phoneGroup.classList.remove('show');
+                buttonText.textContent = 'Sign In';
+                toggleText.textContent = "Don't have an account? ";
+                toggleLink.textContent = 'Create one';
+                document.getElementById('fullName').required = false;
+                document.getElementById('phoneNumber').required = false;
+            } else {
+                formTitle.textContent = 'Create Account';
+                fullNameGroup.classList.add('show');
+                phoneGroup.classList.add('show');
+                buttonText.textContent = 'Create Account';
+                toggleText.textContent = 'Already have an account? ';
+                toggleLink.textContent = 'Sign In';
+                document.getElementById('fullName').required = true;
+                document.getElementById('phoneNumber').required = true;
+            }
+        }
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isLoginMode) {
+                handleLogin();
+            } else {
+                handleRegister();
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            setLoadingState(true, 'Signing In...');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionStorage.setItem('authToken', data.token);
+                    sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+                    setSuccessState('Success! Redirecting...');
+                    setTimeout(() => { window.location.href = './dashboard.html'; }, 1000);
+                } else {
+                    setErrorState(data.message || 'Invalid Credentials');
+                }
+            } catch (error) {
+                setErrorState('Server Error');
+            }
+        }
+
+        async function handleRegister() {
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            setLoadingState(true, 'Creating Account...');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, phoneNumber, email, password }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    setSuccessState(data.message);
+                    setTimeout(() => {
+                        isLoginMode = true;
+                        updateFormMode();
+                        resetFormState();
+                    }, 2000);
+                } else {
+                    setErrorState(data.message || 'Registration failed.');
+                }
+            } catch (error) {
+                setErrorState('Server Error');
+            }
+        }
+
+        function setLoadingState(isLoading, text) {
+            buttonText.innerHTML = isLoading ? `<span class="loading-spinner"></span>${text}` : text;
+            submitBtn.disabled = isLoading;
+        }
+
+        function setSuccessState(message) {
+            buttonText.innerHTML = `<span>✓</span> ${message}`;
+            submitBtn.style.background = 'linear-gradient(135deg, #00b894, #00a085)';
+        }
+
+        function setErrorState(message) {
+            buttonText.innerHTML = `<span>✗</span> ${message}`;
+            submitBtn.style.background = 'linear-gradient(135deg, #e17055, #d63031)';
+            setTimeout(() => resetFormState(), 2000);
+        }
+
+        function resetFormState() {
+            submitBtn.disabled = false;
+            submitBtn.style.background = '';
+            buttonText.innerHTML = isLoginMode ? 'Sign In' : 'Create Account';
+        }
+    </script>
+</body>
+
+</html>
