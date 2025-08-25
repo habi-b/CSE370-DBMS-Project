@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Apply for a Loan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .loan-form-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-select option {
+            background: #333;
+            color: white;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="nav-section">
+                <a href="./dynamic_loan_scoring.html" class="back-btn">← Back to Eligibility</a>
+            </div>
+        </div>
+    </header>
+
+  
+    <div class="main-container">
+        <h1 class="page-title">
+            <span>📝</span>
+            Loan Application
+        </h1>
+        <p class="page-subtitle">Please fill out the details below to submit your loan application for review.</p>
+
+        <div class="loan-form-container">
+            <form id="loanApplicationForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="loanType">Loan Type</label>
+                        <input type="text" id="loanType" class="form-input" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="amountRequested">Amount Requested (৳)</label>
+                        <input type="number" id="amountRequested" class="form-input" placeholder="e.g., 200000"
+                            min="10000" step="1000" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="purpose">Purpose of Loan</label>
+                        <input type="text" id="purpose" class="form-input"
+                            placeholder="e.g., Car down payment, Home renovation" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="term">Loan Term</label>
+                        <select id="term" class="form-select" required>
+                            <option value="">Select Term</option>
+                            <option value="12">12 Months</option>
+                            <option value="24">24 Months</option>
+                            <option value="36">36 Months</option>
+                            <option value="48">48 Months</option>
+                            <option value="60">60 Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const token = sessionStorage.getItem('authToken');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Security Check
+            if (!token) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            // Get loan type from URL and populate the form
+            const urlParams = new URLSearchParams(window.location.search);
+            const loanType = urlParams.get('type');
+            if (loanType) {
+                document.getElementById('loanType').value = loanType;
+            }
+
+            document.getElementById('loanApplicationForm').addEventListener('submit', handleLoanApplication);
+        });
+
+        async function handleLoanApplication(e) {
+            e.preventDefault();
+
+            const applicationData = {
+                amount_requested: parseFloat(document.getElementById('amountRequested').value),
+                purpose: document.getElementById('purpose').value,
+                term_in_months: parseInt(document.getElementById('term').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/loans/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(applicationData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to submit application');
+                }
+
+                alert('Loan application submitted successfully! You will be redirected to the eligibility page.');
+                window.location.href = './dynamic_loan_scoring.html';
+
+            } catch (error) {
+                console.error('Error submitting loan application:', error);
+                alert('There was an error submitting your application. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>
