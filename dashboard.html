@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+      
+        .user-info-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .panel-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .balance-section {
+            margin-top: 10px;
+        }
+
+        .balance-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .account-balances {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .account-balances.show {
+            display: block;
+        }
+
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-type {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .account-balance {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .features-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .features-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .features-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .feature-status {
+            margin-top: 12px;
+            padding: 4px 8px;
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+            font-size: 11px;
+            border-radius: 6px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quick-actions {
+            margin-top: 20px;
+        }
+
+        .quick-action-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+
+            .brand-text {
+                font-size: 20px;
+            }
+
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="user-section">
+                <div class="welcome-text">
+                    Welcome, <span class="user-name" id="userName">User</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+
+    <div class="main-container">
+
+        <aside class="user-info-panel">
+            <h2 class="panel-title">
+                <span>👤</span>
+                Account Overview
+            </h2>
+
+            <div class="info-item">
+                <div class="info-label">Full Name</div>
+                <div class="info-value" id="userFullName">Loading...</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Email Address</div>
+                <div class="info-value" id="userEmail">Loading...</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Primary Account</div>
+                <div class="info-value" id="primaryAccount">Loading...</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Member Since</div>
+                <div class="info-value" id="memberSince">Loading...</div>
+            </div>
+
+
+            <div class="balance-section">
+                <div class="balance-toggle">
+                    <div class="toggle-switch" id="balanceToggle" onclick="toggleBalance()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span class="toggle-label">Show Account Balances</span>
+                </div>
+
+                <div class="account-balances" id="accountBalances">
+
+                </div>
+            </div>
+        </aside>
+
+
+        <main class="features-container">
+            <h1 class="features-title">Banking Features</h1>
+            <p class="features-subtitle">Access all your banking services from one place</p>
+
+            <div class="features-grid">
+
+                <a href="#" class="feature-card" onclick="openFeature('tiered-savings')">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Tiered Savings Goals</h3>
+                    <p class="feature-description">Set and track multiple savings goals with different priority levels
+                        and automated contributions.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('split-payments')">
+                    <div class="feature-icon">💸</div>
+                    <h3 class="feature-title">Automated Split Bill Payments</h3>
+                    <p class="feature-description">Automatically split and pay bills among multiple accounts or
+                        beneficiaries with custom rules.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('loan-scoring')">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">Dynamic Loan Scoring</h3>
+                    <p class="feature-description">Get real-time loan eligibility and credit scores based on your
+                        transaction history and account behavior.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('financial-insights')">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Personalized Financial Insights</h3>
+                    <p class="feature-description">AI-powered spending analysis, budgeting suggestions, and financial
+                        health recommendations.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('multi-currency')">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Multi-Currency Wallet</h3>
+                    <p class="feature-description">Manage multiple currencies (BDT, USD) with real-time exchange rates
+                        and easy conversion.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('scheduled-transfers')">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">Scheduled Transfers</h3>
+                    <p class="feature-description">Set up recurring transfers between accounts or to beneficiaries with
+                        flexible scheduling options.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('card-management')">
+                    <div class="feature-icon">💳</div>
+                    <h3 class="feature-title">Card Management</h3>
+                    <p class="feature-description">Manage your debit and credit cards, set limits, freeze/unfreeze, and
+                        monitor spending.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('beneficiary-management')">
+                    <div class="feature-icon">👥</div>
+                    <h3 class="feature-title">Beneficiary Management</h3>
+                    <p class="feature-description">Add, edit, and organize your beneficiaries for quick and secure money
+                        transfers.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('transaction-tagging')">
+                    <div class="feature-icon">🏷️</div>
+                    <h3 class="feature-title">Transaction Tagging</h3>
+                    <p class="feature-description">Tag and categorize your transactions for better expense tracking and
+                        financial analysis.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+                <a href="#" class="feature-card" onclick="openFeature('audit-log')">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Audit Log</h3>
+                    <p class="feature-description">View detailed logs of all your banking activities, login attempts,
+                        and security events.</p>
+                    <span class="feature-status">Active</span>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async function () {
+  
+            const token = sessionStorage.getItem('authToken');
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+            if (!token || !currentUser) {
+   
+                window.location.href = './login.html';
+                return;
+            }
+
+  
+            document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
+
+    
+            try {
+                const response = await fetch('http://localhost:3000/api/dashboard', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch dashboard data');
+                }
+
+                const data = await response.json();
+                populateDashboard(data);
+
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+ 
+                document.getElementById('userFullName').textContent = 'Error loading data';
+            }
+        });
+
+        function populateDashboard(data) {
+
+            document.getElementById('userFullName').textContent = data.fullName;
+            document.getElementById('userEmail').textContent = data.email;
+            document.getElementById('memberSince').textContent = formatDate(data.memberSince);
+
+            const primaryAccount = data.accounts.find(acc => acc.account_type === 'Checking');
+            if (primaryAccount) {
+                document.getElementById('primaryAccount').textContent = primaryAccount.account_number;
+            }
+
+
+            const balancesContainer = document.getElementById('accountBalances');
+            balancesContainer.innerHTML = '';
+            let totalBalance = 0;
+
+            data.accounts.forEach(account => {
+                const balanceItem = document.createElement('div');
+                balanceItem.className = 'account-item';
+                balanceItem.innerHTML = `
+                    <span class="account-type">${account.account_type} Account</span>
+                    <span class="account-balance">৳ ${parseFloat(account.balance).toLocaleString()}</span>
+                `;
+                balancesContainer.appendChild(balanceItem);
+                totalBalance += parseFloat(account.balance);
+            });
+
+
+            const totalBalanceItem = document.createElement('div');
+            totalBalanceItem.className = 'account-item';
+            totalBalanceItem.innerHTML = `
+                <span class="account-type" style="font-weight: bold;">Total Balance</span>
+                <span class="account-balance" style="font-weight: bold;">৳ ${totalBalance.toLocaleString()}</span>
+            `;
+            balancesContainer.appendChild(totalBalanceItem);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function toggleBalance() {
+            document.getElementById('balanceToggle').classList.toggle('active');
+            document.getElementById('accountBalances').classList.toggle('show');
+        }
+
+        function openFeature(featureName) {
+
+            switch (featureName) {
+                case 'tiered-savings':
+                    window.location.href = 'tiered_savings_goals.html';
+                    break;
+                case 'card-management':
+                    window.location.href = 'card_management.html';
+                    break;
+                case 'beneficiary-management':
+                    window.location.href = 'beneficiary_management.html';
+                    break;
+                case 'scheduled-transfers':
+                    window.location.href = 'scheduled_transfers.html';
+                    break;
+                case 'loan-scoring':
+                    window.location.href = 'dynamic_loan_scoring.html';
+                    break;
+                default:
+                    alert(`Opening ${featureName} feature...`);
+            }
+        }
+
+        function logout() {
+
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('currentUser');
+            window.location.href = './login.html';
+        }
+    </script>
+</body>
+
+</html>
