@@ -11,7 +11,19 @@ exports.getTransactionsWithTags = async (req, res) => {
             ORDER BY t.transaction_date DESC
         `, [userId]);
         
-        res.status(200).json(transactions);
+        const processedTransactions = transactions.map(transaction => {
+            const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+            const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
+            const tags = tagMatch ? tagMatch[1] : '';
+            
+            return {
+                ...transaction,
+                description: cleanDescription,
+                tags: tags
+            };
+        });
+        
+        res.status(200).json(processedTransactions);
     } catch (error) {
         console.error('Error fetching transactions:', error);
         res.status(500).json({ message: 'Server error while fetching transactions.' });
@@ -35,9 +47,31 @@ exports.updateTransactionTags = async (req, res) => {
             return res.status(404).json({ message: 'Transaction not found or access denied.' });
         }
 
+        const transaction = transactions[0];
+        const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+        
+        let finalTags = '';
+        if (tags && tags.trim()) {
+            const tagArray = tags.split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== '');
+            
+            const uniqueTags = [...new Set(tagArray)];
+            
+            if (uniqueTags.length !== tagArray.length) {
+                return res.status(400).json({ 
+                    message: 'Same tags cannot be saved twice. Please remove duplicate tags.' 
+                });
+            }
+            
+            finalTags = uniqueTags.join(',');
+        }
+
+        const newDescription = finalTags ? `${cleanDescription} [TAGS:${finalTags}]` : cleanDescription;
+
         await db.query(
-            'UPDATE transactions SET description = CONCAT(description, " [TAGS:", ?, "]") WHERE transaction_id = ?',
-            [tags, transactionId]
+            'UPDATE transactions SET description = ? WHERE transaction_id = ?',
+            [newDescription, transactionId]
         );
 
         const [updatedTransaction] = await db.query(`
@@ -85,44 +119,21 @@ exports.getAllTags = async (req, res) => {
             WHERE a.user_id = ? AND t.description LIKE '%[TAGS:%]%'
         `, [userId]);
         
-        const tags = new Set();
+        const allTags = new Set();
         
         transactions.forEach(transaction => {
             const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
             if (tagMatch && tagMatch[1]) {
                 tagMatch[1].split(',').forEach(tag => {
-                    if (tag.trim()) tags.add(tag.trim());
+                    const cleanedTag = tag.trim();
+                    if (cleanedTag) allTags.add(cleanedTag);
                 });
             }
         });
         
-        res.status(200).json(Array.from(tags));
+        res.status(200).json(Array.from(allTags).sort());
     } catch (error) {
         console.error('Error fetching all tags:', error);
         res.status(500).json({ message: 'Server error while fetching all tags.' });
     }
-};
-
-exports.removeTagsFromDescription = (transaction) => {
-    if (!transaction.description) return transaction;
-    
-    const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
-    return {
-        ...transaction,
-        description: cleanDescription
-    };
-};
-
-exports.extractTagsFromDescription = (transaction) => {
-    if (!transaction.description) return { transaction, tags: '' };
-    
-    const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
-    const tags = tagMatch ? tagMatch[1] : '';
-    const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
-    
-    return {
-        ...transaction,
-        description: cleanDescription,
-        tags: tags
-    };
 };
