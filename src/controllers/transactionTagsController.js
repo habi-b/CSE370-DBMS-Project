@@ -12,7 +12,8 @@ exports.getTransactionsWithTags = async (req, res) => {
         `, [userId]);
         
         const processedTransactions = transactions.map(transaction => {
-            const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+            // Fix 1: Use global regex to remove ALL [TAGS:] instances
+            const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
             const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
             const tags = tagMatch ? tagMatch[1] : '';
             
@@ -48,7 +49,8 @@ exports.updateTransactionTags = async (req, res) => {
         }
 
         const transaction = transactions[0];
-        const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+        // Fix 1: Use global regex to remove ALL [TAGS:] instances
+        const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
         
         let finalTags = '';
         if (tags && tags.trim()) {
@@ -56,15 +58,17 @@ exports.updateTransactionTags = async (req, res) => {
                 .map(tag => tag.trim())
                 .filter(tag => tag !== '');
             
-            const uniqueTags = [...new Set(tagArray)];
+            // Fix 3: Case-insensitive duplicate check
+            const lowerCaseTags = tagArray.map(tag => tag.toLowerCase());
+            const uniqueLowerCase = [...new Set(lowerCaseTags)];
             
-            if (uniqueTags.length !== tagArray.length) {
+            if (uniqueLowerCase.length !== tagArray.length) {
                 return res.status(400).json({ 
-                    message: 'Same tags cannot be saved twice. Please remove duplicate tags.' 
+                    message: 'Cannot save the same tag twice! Please remove duplicate tags.' 
                 });
             }
             
-            finalTags = uniqueTags.join(',');
+            finalTags = tagArray.join(',');
         }
 
         const newDescription = finalTags ? `${cleanDescription} [TAGS:${finalTags}]` : cleanDescription;
