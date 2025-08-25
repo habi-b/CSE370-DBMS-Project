@@ -321,7 +321,19 @@
                 
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 
-                allTransactions = await response.json();
+                const transactions = await response.json();
+                allTransactions = transactions.map(transaction => {
+                    const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+                    const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
+                    const tags = tagMatch ? tagMatch[1] : '';
+                    
+                    return {
+                        ...transaction,
+                        description: cleanDescription,
+                        tags: tags
+                    };
+                });
+                
                 renderTransactions();
             } catch (error) {
                 console.error('Error fetching transactions:', error);
@@ -430,6 +442,7 @@
                 
                 showNotification('Tags updated successfully! 🏷️');
                 fetchAllTags();
+                fetchTransactions();
             } catch (error) {
                 console.error('Error saving tags:', error);
                 showNotification('Error updating tags.', 'error');
