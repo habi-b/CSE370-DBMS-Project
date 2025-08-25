@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Loan Eligibility</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .eligibility-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            height: fit-content;
+        }
+
+        .eligibility-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .eligibility-display {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 8px solid rgba(255, 255, 255, 0.2);
+            transition: border-color 0.5s ease;
+        }
+
+        .eligibility-display.status-excellent {
+            border-color: #00b894;
+        }
+
+        .eligibility-display.status-good {
+            border-color: #2ecc71;
+        }
+
+        .eligibility-display.status-fair {
+            border-color: #f1c40f;
+        }
+
+        .eligibility-display.status-poor {
+            border-color: #e74c3c;
+        }
+
+        .eligibility-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .eligibility-rating {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .eligibility-summary {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .last-updated {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-name {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .status-excellent {
+            color: #00b894;
+        }
+
+        .status-good {
+            color: #2ecc71;
+        }
+
+        .status-fair {
+            color: #f1c40f;
+        }
+
+        .status-poor {
+            color: #e74c3c;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card.eligible {
+            border: 1px solid #00b894;
+        }
+
+        .product-card.ineligible {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+
+        .product-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .product-details {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .product-action .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-apply {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-ineligible {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-table th {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .status-tag {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-approved {
+            background: rgba(0, 184, 148, 0.3);
+            color: #00b894;
+        }
+
+        .status-pending {
+            background: rgba(241, 196, 15, 0.3);
+            color: #f1c40f;
+        }
+
+        .status-rejected {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+  
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="nav-section">
+                <a href="./dashboard.html" class="back-btn">← Back to Dashboard</a>
+                <span class="user-name" id="userName">User</span>
+            </div>
+        </div>
+    </header>
+
+
+    <div class="main-container">
+        <h1 class="page-title">
+            <span>💡</span>
+            Loan Eligibility Analysis
+        </h1>
+        <p class="page-subtitle">Understand your financial health and see which loan products you may be eligible for
+        </p>
+
+        <div class="content-grid">
+
+            <aside class="eligibility-panel">
+                <h2 class="eligibility-title">Your Loan Eligibility</h2>
+                <div class="eligibility-display" id="eligibilityDisplay">
+                    <div>
+                        <div class="eligibility-icon" id="eligibilityIcon">⏳</div>
+                        <div class="eligibility-rating" id="eligibilityRating">Calculating...</div>
+                    </div>
+                </div>
+                <p class="eligibility-summary" id="eligibilitySummary">
+                    We are analyzing your financial data to determine your eligibility.
+                </p>
+                <p class="last-updated" id="lastUpdated"></p>
+            </aside>
+
+            <main class="main-content">
+
+                <div class="content-card">
+                    <h3 class="card-title">
+                        <span>📊</span>
+                        Key Financial Metrics
+                    </h3>
+                    <div class="metrics-grid" id="metricsGrid">
+
+                    </div>
+                </div>
+
+
+                <div class="content-card">
+                    <h3 class="card-title">
+                        <span>💰</span>
+                        Available Loan Products
+                    </h3>
+                    <div class="products-grid" id="productsGrid">
+
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="card-title">
+                        <span>📋</span>
+                        Loan Application History
+                    </h3>
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Purpose</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loanHistoryBody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const token = sessionStorage.getItem('authToken');
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            if (!token) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            document.getElementById('userName').textContent = currentUser.name ? currentUser.name.split(' ')[0] : 'User';
+
+            fetchEligibilityData();
+        });
+
+        async function fetchEligibilityData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/loans/eligibility`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) window.location.href = './login.html';
+                    throw new Error('Failed to fetch eligibility data');
+                }
+                const data = await response.json();
+                displayAllData(data);
+            } catch (error) {
+                console.error('Error fetching eligibility data:', error);
+                document.getElementById('eligibilityRating').textContent = 'Error';
+            }
+        }
+
+        function displayAllData(data) {
+            displayEligibility(data.rating);
+            displayMetrics(data.metrics);
+            displayLoanProducts(data.eligibilityScore);
+            displayLoanHistory(data.loanHistory);
+        }
+
+        function displayEligibility(rating) {
+            const displayEl = document.getElementById('eligibilityDisplay');
+            const iconEl = document.getElementById('eligibilityIcon');
+            const ratingEl = document.getElementById('eligibilityRating');
+            const summaryEl = document.getElementById('eligibilitySummary');
+
+            let summary = '';
+            let icon = '';
+
+            switch (rating) {
+                case 'Excellent':
+                    icon = '🏆';
+                    summary = 'You have outstanding financial health and are eligible for our best loan products.';
+                    break;
+                case 'Good':
+                    icon = '👍';
+                    summary = 'Your financial health is strong. You have access to a wide range of loan products.';
+                    break;
+                case 'Fair':
+                    icon = '🙂';
+                    summary = 'Your financial health is fair. You may be eligible for some loans with standard rates.';
+                    break;
+                default:
+                    icon = '🤔';
+                    summary = 'Your financial health needs improvement. Focus on the metrics below to improve your eligibility.';
+            }
+
+            displayEl.className = `eligibility-display status-${rating.toLowerCase()}`;
+            iconEl.textContent = icon;
+            ratingEl.textContent = rating;
+            summaryEl.textContent = summary;
+
+            document.getElementById('lastUpdated').textContent = `Last analyzed: ${new Date().toLocaleString()}`;
+        }
+
+        function displayMetrics(metrics) {
+            const metricsGrid = document.getElementById('metricsGrid');
+            metricsGrid.innerHTML = '';
+            for (const [name, data] of Object.entries(metrics)) {
+                const metricEl = document.createElement('div');
+                metricEl.className = 'metric-item';
+                metricEl.innerHTML = `
+                    <div class="metric-name">${name}</div>
+                    <div class="metric-value status-${data.status.toLowerCase()}">${data.value}</div>
+                `;
+                metricsGrid.appendChild(metricEl);
+            }
+        }
+
+        function displayLoanProducts(score) {
+            const products = [
+                { name: 'Personal Loan', details: 'Up to ৳500,000 | 9.5% interest', minScore: 60 },
+                { name: 'Home Loan', details: 'Up to ৳5,000,000 | 8.0% interest', minScore: 80 },
+                { name: 'Car Loan', details: 'Up to ৳2,000,000 | 8.5% interest', minScore: 70 },
+                { name: 'Credit Builder Loan', details: 'Up to ৳50,000 | 12.0% interest', minScore: 20 }
+            ];
+
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+            products.forEach(product => {
+                const isEligible = score >= product.minScore;
+                const productEl = document.createElement('div');
+                productEl.className = `product-card ${isEligible ? 'eligible' : 'ineligible'}`;
+                productEl.innerHTML = `
+                    <h4 class="product-title">${product.name}</h4>
+                    <p class="product-details">${product.details}</p>
+                    <div class="product-action">
+                        ${isEligible ?
+                        `<button class="btn btn-apply" onclick="applyForLoan('${product.name}')">Apply Now</button>` :
+                        `<button class="btn btn-ineligible">Not Eligible</button>`
+                    }
+                    </div>
+                `;
+                productsGrid.appendChild(productEl);
+            });
+        }
+
+        function displayLoanHistory(loans) {
+            const historyBody = document.getElementById('loanHistoryBody');
+            historyBody.innerHTML = '';
+            if (loans.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: rgba(255,255,255,0.7);">No loan applications found.</td></tr>';
+                return;
+            }
+
+            loans.forEach(loan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(loan.created_at).toLocaleDateString()}</td>
+                    <td>${loan.purpose}</td>
+                    <td>৳ ${parseFloat(loan.amount_requested).toLocaleString()}</td>
+                    <td><span class="status-tag status-${loan.status.toLowerCase()}">${loan.status}</span></td>
+                `;
+                historyBody.appendChild(row);
+            });
+        }
+
+        function applyForLoan(loanName) {
+            window.location.href = `./apply_loan.html?type=${encodeURIComponent(loanName)}`;
+        }
+    </script>
+</body>
+
+</html>
