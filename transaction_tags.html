@@ -427,7 +427,7 @@
         async function saveTags(transactionId) {
             const tagInput = document.querySelector(`.tag-input[data-transaction-id="${transactionId}"]`);
             const tags = tagInput.value.trim();
-
+            
             try {
                 const response = await fetch(`${API_BASE_URL}/transaction-tags/${transactionId}`, {
                     method: 'PUT',
@@ -437,15 +437,23 @@
                     },
                     body: JSON.stringify({ tags })
                 });
-
-                if (!response.ok) throw new Error('Failed to update tags');
                 
-                showNotification('Tags updated successfully! 🏷️');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (errorData.message && errorData.message.includes('Same tags cannot be saved twice')) {
+                        showNotification('❌ Same tags cannot be saved twice. Please remove duplicate tags.', 'error');
+                    } else {
+                        throw new Error(errorData.message || 'Failed to update tags');
+                    }
+                    return;
+                }
+        
+                showNotification('✅ Tags updated successfully! 🏷️');
                 fetchAllTags();
                 fetchTransactions();
             } catch (error) {
                 console.error('Error saving tags:', error);
-                showNotification('Error updating tags.', 'error');
+                showNotification('❌ Error updating tags.', 'error');
             }
         }
 
