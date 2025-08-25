@@ -23,7 +23,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/schedules', scheduledTransfersRoutes);
-app.use('/api/transactiontags', transactiontagsRoutes);
+app.use('/api/transaction-tags', transactiontagsRoutes);
 
 // the port for the server to listen on
 const PORT = process.env.PORT || 3000;
