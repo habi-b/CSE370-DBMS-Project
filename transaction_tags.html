@@ -322,8 +322,10 @@
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 
                 const transactions = await response.json();
+                
+                // FIX: Use global regex to remove ALL [TAGS:] instances
                 allTransactions = transactions.map(transaction => {
-                    const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/, '');
+                    const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
                     const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
                     const tags = tagMatch ? tagMatch[1] : '';
                     
@@ -358,6 +360,9 @@
 
         function renderTagCloud() {
             const tagCloud = document.getElementById('tagCloud');
+            
+            // FIX: Clear existing tags (except the "All Transactions" button)
+            tagCloud.innerHTML = '<div class="tag-item active" data-tag="all">All Transactions</div>';
             
             allTags.forEach(tag => {
                 const tagElement = document.createElement('div');
@@ -441,7 +446,7 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     if (errorData.message && errorData.message.includes('Same tags cannot be saved twice')) {
-                        showNotification('❌ Same tags cannot be saved twice. Please remove duplicate tags.', 'error');
+                        showNotification('❌ Cannot save the same tag twice! Please remove duplicate tags.', 'error');
                     } else {
                         throw new Error(errorData.message || 'Failed to update tags');
                     }
