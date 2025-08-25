@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Scheduled Transfers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .add-schedule-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .add-schedule-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .add-schedule-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-icon {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(45deg);
+        }
+
+        .add-schedule-form {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .add-schedule-form.show {
+            display: grid;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-select option {
+            background: #333;
+            color: white;
+        }
+
+        .form-actions {
+            grid-column: 1/-1;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .summary-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .stat-number {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .schedules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .schedule-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .schedule-info {
+            flex: 1;
+        }
+
+        .schedule-recipient {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .schedule-amount {
+            color: #00b894;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .schedule-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(0, 184, 148, 0.3);
+            color: #00b894;
+        }
+
+        .status-paused {
+            background: rgba(241, 196, 15, 0.3);
+            color: #f1c40f;
+        }
+
+        .schedule-details {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 600;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: white;
+        }
+
+        .btn-resume {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            grid-column: 1/-1;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .schedules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="nav-section">
+                <a href="./dashboard.html" class="back-btn">← Back to Dashboard</a>
+                <span class="user-name" id="userName">User</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <h1 class="page-title">
+            <span>⏰</span>
+            Scheduled Transfers
+        </h1>
+        <p class="page-subtitle">Set up recurring and future-dated transfers to automate your payments</p>
+
+        <div class="add-schedule-section">
+            <div class="add-schedule-toggle" onclick="toggleAddForm()">
+                <h2 class="add-schedule-title">
+                    <span>➕</span>
+                    Create New Schedule
+                </h2>
+                <span class="toggle-icon" id="toggleIcon">+</span>
+            </div>
+
+            <form class="add-schedule-form" id="addScheduleForm">
+                <div class="form-group">
+                    <label class="form-label" for="fromAccount">From Account</label>
+                    <select id="fromAccount" class="form-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="toBeneficiary">To Beneficiary</label>
+                    <select id="toBeneficiary" class="form-select" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="amount">Amount (৳)</label>
+                    <input type="number" id="amount" class="form-input" placeholder="5000" min="100" step="100"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="frequency">Frequency</label>
+                    <select id="frequency" class="form-select" required>
+                        <option value="One-time">One-time</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Weekly">Weekly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="startDate">Start Date</label>
+                    <input type="date" id="startDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="endDate">End Date (Optional)</label>
+                    <input type="date" id="endDate" class="form-input">
+                </div>
+                <div class="form-group" style="grid-column: 1/-1;">
+                    <label class="form-label" for="notes">Notes (Optional)</label>
+                    <input type="text" id="notes" class="form-input" placeholder="e.g., Monthly rent payment">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="summary-panel">
+            <h2 class="summary-title">
+                <span>📊</span>
+                Schedules Overview
+            </h2>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalSchedules">0</div>
+                    <div class="stat-label">Total Schedules</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeSchedules">0</div>
+                    <div class="stat-label">Active Schedules</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalOutgoing">৳ 0</div>
+                    <div class="stat-label">Outgoing This Month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="nextTransferDate">--</div>
+                    <div class="stat-label">Next Transfer</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="schedules-grid" id="schedulesGrid"></div>
+    </div>
+
+    <script>
+        let currentSchedules = [];
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const token = sessionStorage.getItem('authToken');
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            if (!token) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            document.getElementById('userName').textContent = currentUser.name ? currentUser.name.split(' ')[0] : 'User';
+
+            loadInitialData();
+            setupEventListeners();
+            setMinDates();
+        });
+
+        async function loadInitialData() {
+            await populateDropdowns();
+            await fetchSchedules();
+        }
+
+        async function fetchSchedules() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/schedules`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch schedules');
+                currentSchedules = await response.json();
+                renderSchedules();
+                updateSummary();
+            } catch (error) {
+                console.error('Error fetching schedules:', error);
+                showNotification('Error fetching schedules.', 'error');
+            }
+        }
+
+        async function populateDropdowns() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/schedules/form-options`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch form options');
+                const { accounts, beneficiaries } = await response.json();
+
+                const fromAccountSelect = document.getElementById('fromAccount');
+                const toBeneficiarySelect = document.getElementById('toBeneficiary');
+
+                fromAccountSelect.innerHTML = '<option value="">Select Account</option>';
+                accounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc.account_id;
+                    option.textContent = `${acc.account_type} - ${acc.account_number}`;
+                    fromAccountSelect.appendChild(option);
+                });
+
+                toBeneficiarySelect.innerHTML = '<option value="">Select Beneficiary</option>';
+                beneficiaries.forEach(ben => {
+                    const option = document.createElement('option');
+                    option.value = ben.beneficiary_id;
+                    option.textContent = `${ben.beneficiary_name} - ${ben.beneficiary_account_number}`;
+                    toBeneficiarySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error populating dropdowns:', error);
+                showNotification('Error loading form data.', 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('addScheduleForm').addEventListener('submit', handleFormSubmit);
+        }
+
+        function renderSchedules() {
+            const schedulesGrid = document.getElementById('schedulesGrid');
+            schedulesGrid.innerHTML = '';
+
+            if (currentSchedules.length === 0) {
+                schedulesGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">⏰</div><h3>No Scheduled Transfers</h3><p>Create a new schedule to automate your future payments.</p></div>`;
+                return;
+            }
+
+            currentSchedules.forEach(schedule => {
+                const scheduleElement = document.createElement('div');
+                scheduleElement.className = 'schedule-card';
+                scheduleElement.innerHTML = createScheduleHTML(schedule);
+                schedulesGrid.appendChild(scheduleElement);
+            });
+        }
+
+        function createScheduleHTML(schedule) {
+            const nextDueDate = calculateNextDueDate(schedule);
+            return `
+                <div class="schedule-header">
+                    <div class="schedule-info">
+                        <div class="schedule-recipient">${schedule.beneficiary_name}</div>
+                        <div class="schedule-amount">৳ ${parseFloat(schedule.amount).toLocaleString()}</div>
+                    </div>
+                    <div class="schedule-status status-${schedule.status.toLowerCase()}">${schedule.status}</div>
+                </div>
+                <div class="schedule-details">
+                    <div class="detail-item"><span class="detail-label">From Account:</span><span class="detail-value">${schedule.from_account_number.slice(-8)}</span></div>
+                    <div class="detail-item"><span class="detail-label">Frequency:</span><span class="detail-value">${schedule.frequency}</span></div>
+                    <div class="detail-item"><span class="detail-label">Next Transfer:</span><span class="detail-value">${nextDueDate !== 'Completed' ? formatDate(nextDueDate) : 'Completed'}</span></div>
+                    ${schedule.end_date ? `<div class="detail-item"><span class="detail-label">Ends On:</span><span class="detail-value">${formatDate(schedule.end_date)}</span></div>` : ''}
+                </div>
+                <div class="schedule-actions">
+                    ${schedule.status === 'Active' ?
+                    `<button class="action-btn btn-pause" onclick="togglePauseSchedule(${schedule.schedule_id}, 'Paused')">⏸️ Pause</button>` :
+                    `<button class="action-btn btn-resume" onclick="togglePauseSchedule(${schedule.schedule_id}, 'Active')">▶️ Resume</button>`
+                }
+                    <button class="action-btn btn-delete" onclick="deleteSchedule(${schedule.schedule_id})">🗑️ Delete</button>
+                </div>
+            `;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const newSchedule = {
+                from_account_id: parseInt(document.getElementById('fromAccount').value),
+                beneficiary_id: parseInt(document.getElementById('toBeneficiary').value),
+                amount: parseFloat(document.getElementById('amount').value),
+                frequency: document.getElementById('frequency').value,
+                start_date: document.getElementById('startDate').value,
+                end_date: document.getElementById('endDate').value || null,
+                notes: document.getElementById('notes').value,
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/schedules`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(newSchedule)
+                });
+                if (!response.ok) throw new Error('Failed to create schedule');
+                await fetchSchedules();
+                resetForm();
+                showNotification('Schedule created successfully! ⏰');
+            } catch (error) {
+                console.error('Error creating schedule:', error);
+                showNotification('Error creating schedule.', 'error');
+            }
+        }
+
+        async function togglePauseSchedule(scheduleId, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus.toLowerCase()} this schedule?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/schedules/${scheduleId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!response.ok) throw new Error('Failed to update status');
+                await fetchSchedules();
+                showNotification(`Schedule ${newStatus.toLowerCase()}d successfully!`);
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showNotification('Error updating status.', 'error');
+            }
+        }
+
+        async function deleteSchedule(scheduleId) {
+            if (!confirm('Are you sure you want to delete this schedule? This action cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/schedules/${scheduleId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to delete schedule');
+                await fetchSchedules();
+                showNotification('Schedule deleted successfully! 🗑️');
+            } catch (error) {
+                console.error('Error deleting schedule:', error);
+                showNotification('Error deleting schedule.', 'error');
+            }
+        }
+
+
+        function updateSummary() {
+            const totalSchedules = currentSchedules.length;
+            const activeSchedules = currentSchedules.filter(s => s.status === 'Active').length;
+            const totalOutgoing = currentSchedules.filter(s => s.status === 'Active' && s.frequency === 'Monthly').reduce((sum, s) => sum + parseFloat(s.amount), 0);
+            const upcomingTransfers = currentSchedules.map(s => ({ ...s, nextDueDate: calculateNextDueDate(s) })).filter(s => s.nextDueDate !== 'Completed' && s.status === 'Active').sort((a, b) => new Date(a.nextDueDate) - new Date(b.nextDueDate));
+            document.getElementById('totalSchedules').textContent = totalSchedules;
+            document.getElementById('activeSchedules').textContent = activeSchedules;
+            document.getElementById('totalOutgoing').textContent = `৳ ${totalOutgoing.toLocaleString()}`;
+            document.getElementById('nextTransferDate').textContent = upcomingTransfers.length > 0 ? formatDate(upcomingTransfers[0].nextDueDate) : '--';
+        }
+
+        function calculateNextDueDate(schedule) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let startDate = new Date(schedule.start_date);
+            if (startDate > today) return schedule.start_date;
+            if (schedule.frequency === 'One-time') return startDate > today ? schedule.start_date : 'Completed';
+            let nextDate = new Date(startDate);
+            while (nextDate <= today) {
+                if (schedule.frequency === 'Weekly') nextDate.setDate(nextDate.getDate() + 7);
+                else if (schedule.frequency === 'Monthly') nextDate.setMonth(nextDate.getMonth() + 1);
+            }
+            if (schedule.end_date && nextDate > new Date(schedule.end_date)) return 'Completed';
+            return nextDate.toISOString().split('T')[0];
+        }
+
+        function toggleAddForm() {
+            const form = document.getElementById('addScheduleForm');
+            const icon = document.getElementById('toggleIcon');
+            form.classList.toggle('show');
+            icon.classList.toggle('open');
+            if (!form.classList.contains('show')) resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('addScheduleForm').reset();
+            document.getElementById('addScheduleForm').classList.remove('show');
+            document.getElementById('toggleIcon').classList.remove('open');
+        }
+
+        function setMinDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+            document.getElementById('endDate').min = today;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const successGradient = 'linear-gradient(135deg, #00b894, #00a085)';
+            const errorGradient = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? successGradient : errorGradient}; color: white; padding: 15px 20px; border-radius: 10px; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateX(120%); transition: transform 0.3s ease;`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+
+</html>
