@@ -6,6 +6,7 @@ const loanRoutes = require('./src/routes/loanRoutes');
 const scheduledTransfersRoutes = require('./src/routes/scheduledTransfersRoutes');
 const transactionTagsRoutes = require('./src/routes/transactionTagsRoutes');
 const beneficiaryRoutes = require('./src/routes/beneficiaryRoutes');
+const insightsRoutes = require('./src/routes/insightsRoutes');
 require('dotenv').config(); // Loads environment variables from a .env file
 
 // Import routes
@@ -26,7 +27,7 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/schedules', scheduledTransfersRoutes);
 app.use('/api/transaction-tags', transactionTagsRoutes);
 app.use('/api/beneficiaries', beneficiaryRoutes);
-
+app.use('/api/insights', insightsRoutes);
 // the port for the server to listen on
 const PORT = process.env.PORT || 3000;
 
