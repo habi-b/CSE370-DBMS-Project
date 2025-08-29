@@ -85,6 +85,7 @@ exports.deleteBeneficiary = async (req, res) => {
     const { beneficiaryId } = req.params;
 
     try {
+        // First check if the beneficiary exists and belongs to the user
         const [beneficiary] = await db.query(`
             SELECT * FROM beneficiaries 
             WHERE beneficiary_id = ? AND user_id = ?
@@ -94,6 +95,21 @@ exports.deleteBeneficiary = async (req, res) => {
             return res.status(404).json({ message: 'Beneficiary not found or access denied.' });
         }
 
+        // Check if this beneficiary is used in any scheduled transfers
+        const [scheduledTransfers] = await db.query(`
+            SELECT * FROM scheduled_transfers 
+            WHERE beneficiary_id = ?
+        `, [beneficiaryId]);
+        
+        // If there are scheduled transfers, delete them first
+        if (scheduledTransfers.length > 0) {
+            await db.query(`
+                DELETE FROM scheduled_transfers 
+                WHERE beneficiary_id = ?
+            `, [beneficiaryId]);
+        }
+
+        // Now delete the beneficiary
         await db.query(`
             DELETE FROM beneficiaries 
             WHERE beneficiary_id = ? AND user_id = ?
