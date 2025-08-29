@@ -56,7 +56,7 @@
 
         .brand-text {
             color: white;
-            fontSize: 24px;
+            font-size: 24px;
             font-weight: 700;
         }
 
@@ -168,7 +168,7 @@
             justify-content: center;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .delete-tag-btn:hover {
@@ -260,82 +260,6 @@
             opacity: 0.6;
         }
 
-        .delete-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .modal-text {
-            font-size: 16px;
-            margin-bottom: 25px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .modal-tag-name {
-            font-weight: 700;
-            color: #e74c3c;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-        }
-
-        .modal-btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .modal-cancel {
-            background: #f1f2f6;
-            border: 1px solid #ddd;
-            color: #555;
-        }
-
-        .modal-cancel:hover {
-            background: #e2e3e7;
-        }
-
-        .modal-delete {
-            background: #e74c3c;
-            border: none;
-            color: white;
-        }
-
-        .modal-delete:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
-
         @media (max-width: 768px) {
             .table-header, .table-row {
                 grid-template-columns: 1fr 1fr;
@@ -388,24 +312,11 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="delete-modal" id="deleteModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Delete Tag</h2>
-            <p class="modal-text">Are you sure you want to delete the tag "<span class="modal-tag-name" id="modalTagName"></span>"? This will remove this tag from all transactions.</p>
-            <div class="modal-actions">
-                <button class="modal-btn modal-cancel" id="cancelDelete">Cancel</button>
-                <button class="modal-btn modal-delete" id="confirmDelete">Delete</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const API_BASE_URL = 'http://localhost:3000/api';
         const token = sessionStorage.getItem('authToken');
         let allTransactions = [];
         let allTags = [];
-        let tagToDelete = '';
 
         document.addEventListener('DOMContentLoaded', function () {
             if (!token) {
@@ -418,10 +329,6 @@
 
             fetchTransactions();
             fetchAllTags();
-
-            // Setup modal event listeners
-            document.getElementById('cancelDelete').addEventListener('click', closeModal);
-            document.getElementById('confirmDelete').addEventListener('click', deleteTagConfirmed);
         });
 
         async function fetchTransactions(tag = 'all') {
@@ -439,7 +346,6 @@
                 
                 const transactions = await response.json();
                 
-                // FIX: Use global regex to remove ALL [TAGS:] instances
                 allTransactions = transactions.map(transaction => {
                     const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
                     const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
@@ -477,69 +383,30 @@
         function renderTagCloud() {
             const tagCloud = document.getElementById('tagCloud');
             
-            // FIX: Clear existing tags (except the "All Transactions" button)
             tagCloud.innerHTML = '<div class="tag-item active" data-tag="all">All Transactions</div>';
             
             allTags.forEach(tag => {
                 const tagElement = document.createElement('div');
                 tagElement.className = 'tag-item';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <button class="delete-tag-btn" data-tag="${tag}">×</button>
+                `;
                 tagElement.setAttribute('data-tag', tag);
-                
-                const tagText = document.createElement('span');
-                tagText.textContent = tag;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-tag-btn';
-                deleteBtn.innerHTML = '×';
-                deleteBtn.title = 'Delete this tag';
-                deleteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    showDeleteModal(tag);
+                tagElement.onclick = (e) => {
+                    if (!e.target.classList.contains('delete-tag-btn')) {
+                        filterByTag(tag);
+                    }
                 };
                 
-                tagElement.appendChild(tagText);
-                tagElement.appendChild(deleteBtn);
-                tagElement.onclick = () => filterByTag(tag);
+                const deleteBtn = tagElement.querySelector('.delete-tag-btn');
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteTag(tag);
+                };
                 
                 tagCloud.appendChild(tagElement);
             });
-        }
-
-        function showDeleteModal(tag) {
-            tagToDelete = tag;
-            document.getElementById('modalTagName').textContent = tag;
-            document.getElementById('deleteModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-            tagToDelete = '';
-        }
-
-        async function deleteTagConfirmed() {
-            if (!tagToDelete) {
-                closeModal();
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/transaction-tags/tag/${encodeURIComponent(tagToDelete)}`, {
-                    method: 'DELETE',
-                    headers: { 
-                        'Authorization': `Bearer ${token}` 
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Failed to delete tag');
-                
-                showNotification(`Tag "${tagToDelete}" deleted successfully from all transactions!`);
-                closeModal();
-                fetchAllTags();
-                fetchTransactions();
-            } catch (error) {
-                console.error('Error deleting tag:', error);
-                showNotification('Error deleting tag.', 'error');
-            }
         }
 
         function filterByTag(tag) {
@@ -627,6 +494,30 @@
             } catch (error) {
                 console.error('Error saving tags:', error);
                 showNotification('❌ Error updating tags.', 'error');
+            }
+        }
+
+        async function deleteTag(tag) {
+            if (!confirm(`Are you sure you want to delete the tag "${tag}"? This will remove it from all transactions.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/transaction-tags/delete-tag/${encodeURIComponent(tag)}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete tag');
+                
+                showNotification('✅ Tag deleted successfully!');
+                fetchAllTags();
+                fetchTransactions();
+            } catch (error) {
+                console.error('Error deleting tag:', error);
+                showNotification('❌ Error deleting tag.', 'error');
             }
         }
 
