@@ -6,7 +6,7 @@ exports.getBeneficiaries = async (req, res) => {
         const [beneficiaries] = await db.query(`
             SELECT * FROM beneficiaries 
             WHERE user_id = ? 
-            ORDER BY name ASC
+            ORDER BY beneficiary_name ASC
         `, [userId]);
         
         res.status(200).json(beneficiaries);
@@ -18,22 +18,22 @@ exports.getBeneficiaries = async (req, res) => {
 
 exports.addBeneficiary = async (req, res) => {
     const userId = req.user.userId;
-    const { name, accountNumber, bankName, branchName, ifscCode } = req.body;
+    const { beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes } = req.body;
 
     try {
         const [existingBeneficiary] = await db.query(`
             SELECT * FROM beneficiaries 
-            WHERE user_id = ? AND account_number = ?
-        `, [userId, accountNumber]);
+            WHERE user_id = ? AND beneficiary_account_number = ?
+        `, [userId, beneficiary_account_number]);
         
         if (existingBeneficiary.length > 0) {
             return res.status(400).json({ message: 'Beneficiary with this account number already exists.' });
         }
 
         const [result] = await db.query(`
-            INSERT INTO beneficiaries (user_id, name, account_number, bank_name, branch_name, ifsc_code)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `, [userId, name, accountNumber, bankName, branchName, ifscCode]);
+            INSERT INTO beneficiaries (user_id, beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `, [userId, beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes]);
         
         const [newBeneficiary] = await db.query(`
             SELECT * FROM beneficiaries 
@@ -50,7 +50,7 @@ exports.addBeneficiary = async (req, res) => {
 exports.updateBeneficiary = async (req, res) => {
     const userId = req.user.userId;
     const { beneficiaryId } = req.params;
-    const { name, accountNumber, bankName, branchName, ifscCode } = req.body;
+    const { beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes } = req.body;
 
     try {
         const [beneficiary] = await db.query(`
@@ -64,9 +64,9 @@ exports.updateBeneficiary = async (req, res) => {
 
         await db.query(`
             UPDATE beneficiaries 
-            SET name = ?, account_number = ?, bank_name = ?, branch_name = ?, ifsc_code = ?
+            SET beneficiary_name = ?, beneficiary_account_number = ?, bank_name = ?, relationship = ?, nickname = ?, notes = ?
             WHERE beneficiary_id = ? AND user_id = ?
-        `, [name, accountNumber, bankName, branchName, ifscCode, beneficiaryId, userId]);
+        `, [beneficiary_name, beneficiary_account_number, bank_name, relationship, nickname, notes, beneficiaryId, userId]);
         
         const [updatedBeneficiary] = await db.query(`
             SELECT * FROM beneficiaries 
