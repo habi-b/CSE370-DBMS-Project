@@ -616,6 +616,8 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
 
+        
+        
         async function deleteBeneficiary(beneficiaryId) {
             try {
                 const response = await fetch(`${API_BASE_URL}/beneficiaries/${beneficiaryId}`, {
@@ -625,16 +627,22 @@
                     }
                 });
                 
-                if (!response.ok) throw new Error('Failed to delete beneficiary');
+                const responseData = await response.json();
+                if (!response.ok) {
+                    throw new Error(responseData.message || 'Failed to delete beneficiary');
+                }
+                
                 
                 showNotification('✅ Beneficiary deleted successfully!');
                 closeModal();
                 fetchBeneficiaries();
             } catch (error) {
                 console.error('Error deleting beneficiary:', error);
-                showNotification('❌ Error deleting beneficiary.', 'error');
+                showNotification(`❌ ${error.message}`, 'error');
             }
         }
+
+
 
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
