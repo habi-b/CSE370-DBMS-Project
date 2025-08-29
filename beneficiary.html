@@ -197,7 +197,7 @@
 
         .table-header {
             display: grid;
-            grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1fr 1fr;
             background: rgba(255, 255, 255, 0.2);
             padding: 15px 20px;
             font-weight: 600;
@@ -206,7 +206,7 @@
 
         .table-row {
             display: grid;
-            grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr;
+            grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1fr 1fr;
             padding: 15px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
@@ -319,14 +319,20 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .table-header, .table-row {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 gap: 10px;
             }
-            
+        }
+
+        @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .table-header, .table-row {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
@@ -360,24 +366,28 @@
             <form id="addBeneficiaryForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label class="form-label">Beneficiary Name</label>
+                        <label class="form-label">Beneficiary Name *</label>
                         <input type="text" class="form-input" id="beneficiaryName" placeholder="Enter full name" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Account Number</label>
+                        <label class="form-label">Account Number *</label>
                         <input type="text" class="form-input" id="accountNumber" placeholder="Enter account number" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Bank Name</label>
-                        <input type="text" class="form-input" id="bankName" placeholder="Enter bank name" required>
+                        <input type="text" class="form-input" id="bankName" placeholder="Enter bank name" value="Panda Bank">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Branch Name</label>
-                        <input type="text" class="form-input" id="branchName" placeholder="Enter branch name">
+                        <label class="form-label">Relationship</label>
+                        <input type="text" class="form-input" id="relationship" placeholder="E.g., Friend, Family, Colleague">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">IFSC Code</label>
-                        <input type="text" class="form-input" id="ifscCode" placeholder="Enter IFSC code">
+                        <label class="form-label">Nickname</label>
+                        <input type="text" class="form-input" id="nickname" placeholder="Friendly name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <input type="text" class="form-input" id="notes" placeholder="Any additional notes">
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">Add Beneficiary</button>
@@ -388,9 +398,10 @@
             <div class="table-header">
                 <div>Name</div>
                 <div>Account Number</div>
-                <div>Bank Name</div>
-                <div>Branch Name</div>
-                <div>IFSC Code</div>
+                <div>Bank</div>
+                <div>Relationship</div>
+                <div>Nickname</div>
+                <div>Notes</div>
                 <div>Actions</div>
             </div>
             <div id="beneficiariesList"></div>
@@ -413,6 +424,8 @@
         const token = sessionStorage.getItem('authToken');
         let beneficiaries = [];
         let deleteBeneficiaryId = null;
+        let isEditing = false;
+        let editBeneficiaryId = null;
 
         document.addEventListener('DOMContentLoaded', function () {
             if (!token) {
@@ -427,7 +440,11 @@
             
             document.getElementById('addBeneficiaryForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                addBeneficiary();
+                if (isEditing) {
+                    updateBeneficiary(editBeneficiaryId);
+                } else {
+                    addBeneficiary();
+                }
             });
             
             document.getElementById('confirmDelete').addEventListener('click', function() {
@@ -472,11 +489,12 @@
                 const beneficiaryElement = document.createElement('div');
                 beneficiaryElement.className = 'table-row';
                 beneficiaryElement.innerHTML = `
-                    <div>${beneficiary.name}</div>
-                    <div>${beneficiary.account_number}</div>
-                    <div>${beneficiary.bank_name}</div>
-                    <div>${beneficiary.branch_name || 'N/A'}</div>
-                    <div>${beneficiary.ifsc_code || 'N/A'}</div>
+                    <div>${beneficiary.beneficiary_name}</div>
+                    <div>${beneficiary.beneficiary_account_number}</div>
+                    <div>${beneficiary.bank_name || 'N/A'}</div>
+                    <div>${beneficiary.relationship || 'N/A'}</div>
+                    <div>${beneficiary.nickname || 'N/A'}</div>
+                    <div>${beneficiary.notes || 'N/A'}</div>
                     <div>
                         <button class="action-btn btn-edit" onclick="editBeneficiary(${beneficiary.beneficiary_id})">Edit</button>
                         <button class="action-btn btn-delete" onclick="openDeleteModal(${beneficiary.beneficiary_id})">Delete</button>
@@ -487,11 +505,12 @@
         }
 
         async function addBeneficiary() {
-            const name = document.getElementById('beneficiaryName').value;
-            const accountNumber = document.getElementById('accountNumber').value;
-            const bankName = document.getElementById('bankName').value;
-            const branchName = document.getElementById('branchName').value;
-            const ifscCode = document.getElementById('ifscCode').value;
+            const beneficiary_name = document.getElementById('beneficiaryName').value;
+            const beneficiary_account_number = document.getElementById('accountNumber').value;
+            const bank_name = document.getElementById('bankName').value;
+            const relationship = document.getElementById('relationship').value;
+            const nickname = document.getElementById('nickname').value;
+            const notes = document.getElementById('notes').value;
             
             try {
                 const response = await fetch(`${API_BASE_URL}/beneficiaries`, {
@@ -501,11 +520,12 @@
                         'Authorization': `Bearer ${token}` 
                     },
                     body: JSON.stringify({ 
-                        name, 
-                        accountNumber, 
-                        bankName, 
-                        branchName, 
-                        ifscCode 
+                        beneficiary_name, 
+                        beneficiary_account_number, 
+                        bank_name, 
+                        relationship, 
+                        nickname, 
+                        notes 
                     })
                 });
                 
@@ -516,6 +536,7 @@
         
                 showNotification('✅ Beneficiary added successfully!');
                 document.getElementById('addBeneficiaryForm').reset();
+                document.getElementById('bankName').value = 'Panda Bank';
                 fetchBeneficiaries();
             } catch (error) {
                 console.error('Error adding beneficiary:', error);
@@ -526,13 +547,62 @@
         function editBeneficiary(beneficiaryId) {
             const beneficiary = beneficiaries.find(b => b.beneficiary_id === beneficiaryId);
             if (beneficiary) {
-                document.getElementById('beneficiaryName').value = beneficiary.name;
-                document.getElementById('accountNumber').value = beneficiary.account_number;
-                document.getElementById('bankName').value = beneficiary.bank_name;
-                document.getElementById('branchName').value = beneficiary.branch_name || '';
-                document.getElementById('ifscCode').value = beneficiary.ifsc_code || '';
+                document.getElementById('beneficiaryName').value = beneficiary.beneficiary_name;
+                document.getElementById('accountNumber').value = beneficiary.beneficiary_account_number;
+                document.getElementById('bankName').value = beneficiary.bank_name || '';
+                document.getElementById('relationship').value = beneficiary.relationship || '';
+                document.getElementById('nickname').value = beneficiary.nickname || '';
+                document.getElementById('notes').value = beneficiary.notes || '';
+                
+                isEditing = true;
+                editBeneficiaryId = beneficiaryId;
+                
+                document.querySelector('.btn-primary').textContent = 'Update Beneficiary';
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        async function updateBeneficiary(beneficiaryId) {
+            const beneficiary_name = document.getElementById('beneficiaryName').value;
+            const beneficiary_account_number = document.getElementById('accountNumber').value;
+            const bank_name = document.getElementById('bankName').value;
+            const relationship = document.getElementById('relationship').value;
+            const nickname = document.getElementById('nickname').value;
+            const notes = document.getElementById('notes').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/beneficiaries/${beneficiaryId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ 
+                        beneficiary_name, 
+                        beneficiary_account_number, 
+                        bank_name, 
+                        relationship, 
+                        nickname, 
+                        notes 
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update beneficiary');
+                }
+        
+                showNotification('✅ Beneficiary updated successfully!');
+                document.getElementById('addBeneficiaryForm').reset();
+                document.getElementById('bankName').value = 'Panda Bank';
+                document.querySelector('.btn-primary').textContent = 'Add Beneficiary';
+                isEditing = false;
+                editBeneficiaryId = null;
+                fetchBeneficiaries();
+            } catch (error) {
+                console.error('Error updating beneficiary:', error);
+                showNotification(`❌ ${error.message}`, 'error');
             }
         }
 
