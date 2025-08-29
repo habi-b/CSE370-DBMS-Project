@@ -12,7 +12,6 @@ exports.getTransactionsWithTags = async (req, res) => {
         `, [userId]);
         
         const processedTransactions = transactions.map(transaction => {
-            // Fix 1: Use global regex to remove ALL [TAGS:] instances
             const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
             const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
             const tags = tagMatch ? tagMatch[1] : '';
@@ -49,7 +48,6 @@ exports.updateTransactionTags = async (req, res) => {
         }
 
         const transaction = transactions[0];
-        // Fix 1: Use global regex to remove ALL [TAGS:] instances
         const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
         
         let finalTags = '';
@@ -58,7 +56,6 @@ exports.updateTransactionTags = async (req, res) => {
                 .map(tag => tag.trim())
                 .filter(tag => tag !== '');
             
-            // Fix 3: Case-insensitive duplicate check
             const lowerCaseTags = tagArray.map(tag => tag.toLowerCase());
             const uniqueLowerCase = [...new Set(lowerCaseTags)];
             
@@ -139,5 +136,43 @@ exports.getAllTags = async (req, res) => {
     } catch (error) {
         console.error('Error fetching all tags:', error);
         res.status(500).json({ message: 'Server error while fetching all tags.' });
+    }
+};
+
+exports.deleteTag = async (req, res) => {
+    const userId = req.user.userId;
+    const { tag } = req.params;
+
+    try {
+        const [transactions] = await db.query(`
+            SELECT t.transaction_id, t.description 
+            FROM transactions t 
+            JOIN accounts a ON t.account_id = a.account_id 
+            WHERE a.user_id = ? AND t.description LIKE ?
+        `, [userId, `%[TAGS:%${tag}%]%`]);
+        
+        for (const transaction of transactions) {
+            const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
+            if (tagMatch && tagMatch[1]) {
+                let tagsArray = tagMatch[1].split(',')
+                    .map(t => t.trim())
+                    .filter(t => t.toLowerCase() !== tag.toLowerCase());
+                
+                const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
+                const newDescription = tagsArray.length > 0 
+                    ? `${cleanDescription} [TAGS:${tagsArray.join(',')}]` 
+                    : cleanDescription;
+                
+                await db.query(
+                    'UPDATE transactions SET description = ? WHERE transaction_id = ?',
+                    [newDescription, transaction.transaction_id]
+                );
+            }
+        }
+        
+        res.status(200).json({ message: 'Tag deleted successfully from all transactions.' });
+    } catch (error) {
+        console.error('Error deleting tag:', error);
+        res.status(500).json({ message: 'Server error while deleting tag.' });
     }
 };
