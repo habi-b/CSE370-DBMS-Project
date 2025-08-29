@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Beneficiary Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .beneficiary-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .beneficiaries-table {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            grid-column: 1/-1;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirm {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover, .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .table-header, .table-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="nav-section">
+                <a href="./dashboard.html" class="back-btn">← Back to Dashboard</a>
+                <span class="user-name" id="userName">User</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <h1 class="page-title">
+            <span>👥</span>
+            Beneficiary Management
+        </h1>
+        <p class="page-subtitle">Add and manage your beneficiaries for quick transfers</p>
+
+        <div class="beneficiary-section">
+            <h2 class="section-title">
+                <span>➕</span>
+                Add New Beneficiary
+            </h2>
+            <form id="addBeneficiaryForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Beneficiary Name</label>
+                        <input type="text" class="form-input" id="beneficiaryName" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Account Number</label>
+                        <input type="text" class="form-input" id="accountNumber" placeholder="Enter account number" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bank Name</label>
+                        <input type="text" class="form-input" id="bankName" placeholder="Enter bank name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Branch Name</label>
+                        <input type="text" class="form-input" id="branchName" placeholder="Enter branch name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">IFSC Code</label>
+                        <input type="text" class="form-input" id="ifscCode" placeholder="Enter IFSC code">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add Beneficiary</button>
+            </form>
+        </div>
+
+        <div class="beneficiaries-table">
+            <div class="table-header">
+                <div>Name</div>
+                <div>Account Number</div>
+                <div>Bank Name</div>
+                <div>Branch Name</div>
+                <div>IFSC Code</div>
+                <div>Actions</div>
+            </div>
+            <div id="beneficiariesList"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this beneficiary? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-confirm" id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const token = sessionStorage.getItem('authToken');
+        let beneficiaries = [];
+        let deleteBeneficiaryId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!token) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            document.getElementById('userName').textContent = currentUser.name ? currentUser.name.split(' ')[0] : 'User';
+
+            fetchBeneficiaries();
+            
+            document.getElementById('addBeneficiaryForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addBeneficiary();
+            });
+            
+            document.getElementById('confirmDelete').addEventListener('click', function() {
+                if (deleteBeneficiaryId) {
+                    deleteBeneficiary(deleteBeneficiaryId);
+                }
+            });
+        });
+
+        async function fetchBeneficiaries() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/beneficiaries`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch beneficiaries');
+                
+                beneficiaries = await response.json();
+                renderBeneficiaries();
+            } catch (error) {
+                console.error('Error fetching beneficiaries:', error);
+                showNotification('Error fetching beneficiaries.', 'error');
+            }
+        }
+
+        function renderBeneficiaries() {
+            const beneficiariesList = document.getElementById('beneficiariesList');
+            beneficiariesList.innerHTML = '';
+
+            if (beneficiaries.length === 0) {
+                beneficiariesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <h3>No Beneficiaries Found</h3>
+                        <p>You haven't added any beneficiaries yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            beneficiaries.forEach(beneficiary => {
+                const beneficiaryElement = document.createElement('div');
+                beneficiaryElement.className = 'table-row';
+                beneficiaryElement.innerHTML = `
+                    <div>${beneficiary.name}</div>
+                    <div>${beneficiary.account_number}</div>
+                    <div>${beneficiary.bank_name}</div>
+                    <div>${beneficiary.branch_name || 'N/A'}</div>
+                    <div>${beneficiary.ifsc_code || 'N/A'}</div>
+                    <div>
+                        <button class="action-btn btn-edit" onclick="editBeneficiary(${beneficiary.beneficiary_id})">Edit</button>
+                        <button class="action-btn btn-delete" onclick="openDeleteModal(${beneficiary.beneficiary_id})">Delete</button>
+                    </div>
+                `;
+                beneficiariesList.appendChild(beneficiaryElement);
+            });
+        }
+
+        async function addBeneficiary() {
+            const name = document.getElementById('beneficiaryName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const bankName = document.getElementById('bankName').value;
+            const branchName = document.getElementById('branchName').value;
+            const ifscCode = document.getElementById('ifscCode').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/beneficiaries`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ 
+                        name, 
+                        accountNumber, 
+                        bankName, 
+                        branchName, 
+                        ifscCode 
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to add beneficiary');
+                }
+        
+                showNotification('✅ Beneficiary added successfully!');
+                document.getElementById('addBeneficiaryForm').reset();
+                fetchBeneficiaries();
+            } catch (error) {
+                console.error('Error adding beneficiary:', error);
+                showNotification(`❌ ${error.message}`, 'error');
+            }
+        }
+
+        function editBeneficiary(beneficiaryId) {
+            const beneficiary = beneficiaries.find(b => b.beneficiary_id === beneficiaryId);
+            if (beneficiary) {
+                document.getElementById('beneficiaryName').value = beneficiary.name;
+                document.getElementById('accountNumber').value = beneficiary.account_number;
+                document.getElementById('bankName').value = beneficiary.bank_name;
+                document.getElementById('branchName').value = beneficiary.branch_name || '';
+                document.getElementById('ifscCode').value = beneficiary.ifsc_code || '';
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function openDeleteModal(beneficiaryId) {
+            deleteBeneficiaryId = beneficiaryId;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            deleteBeneficiaryId = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        async function deleteBeneficiary(beneficiaryId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/beneficiaries/${beneficiaryId}`, {
+                    method: 'DELETE',
+                    headers: { 
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete beneficiary');
+                
+                showNotification('✅ Beneficiary deleted successfully!');
+                closeModal();
+                fetchBeneficiaries();
+            } catch (error) {
+                console.error('Error deleting beneficiary:', error);
+                showNotification('❌ Error deleting beneficiary.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const successGradient = 'linear-gradient(135deg, #00b894, #00a085)';
+            const errorGradient = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? successGradient : errorGradient}; color: white; padding: 15px 20px; border-radius: 10px; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateX(120%); transition: transform 0.3s ease;`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
