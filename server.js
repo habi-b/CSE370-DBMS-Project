@@ -8,6 +8,7 @@ const transactionTagsRoutes = require('./src/routes/transactionTagsRoutes');
 const beneficiaryRoutes = require('./src/routes/beneficiaryRoutes');
 const insightsRoutes = require('./src/routes/insightsRoutes');
 const cardManagementRoutes = require('./src/routes/cardManagementRoutes');
+const walletRoutes = require('./src/routes/multiCurrencyWalletRoutes');
 require('dotenv').config(); // Loads environment variables from a .env file
 
 // Import routes
@@ -30,6 +31,7 @@ app.use('/api/transaction-tags', transactionTagsRoutes);
 app.use('/api/beneficiaries', beneficiaryRoutes);
 app.use('/api/insights', insightsRoutes);
 app.use('/api/card-management', cardManagementRoutes);
+app.use('/api/wallets', multiCurrencyWalletRoutes);
 // the port for the server to listen on
 const PORT = process.env.PORT || 3000;
 
