@@ -7,6 +7,7 @@ router.use(authenticateToken);
 
 router.get('/', walletController.getWallets);
 router.post('/create', walletController.createWallet);
+router.delete('/:wallet_id', walletController.deleteWallet);
 router.post('/convert', walletController.convertCurrency);
 
 module.exports = router;
