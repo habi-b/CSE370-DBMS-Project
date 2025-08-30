@@ -31,7 +31,7 @@ app.use('/api/transaction-tags', transactionTagsRoutes);
 app.use('/api/beneficiaries', beneficiaryRoutes);
 app.use('/api/insights', insightsRoutes);
 app.use('/api/card-management', cardManagementRoutes);
-app.use('/api/wallets', multiCurrencyWalletRoutes);
+app.use('/api/wallets', walletRoutes);
 // the port for the server to listen on
 const PORT = process.env.PORT || 3000;
 
