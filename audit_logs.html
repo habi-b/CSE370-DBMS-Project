@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Bank - Audit Logs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brand-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .user-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .filter-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .filter-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .filter-input, .filter-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .filter-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .logs-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .logs-table th {
+            text-align: left;
+            padding: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logs-table td {
+            padding: 12px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .logs-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .severity-low {
+            color: #00b894;
+        }
+
+        .severity-medium {
+            color: #feca57;
+        }
+
+        .severity-high {
+            color: #ff9f43;
+        }
+
+        .severity-critical {
+            color: #e74c3c;
+        }
+
+        .outcome-success {
+            color: #00b894;
+        }
+
+        .outcome-failure {
+            color: #e74c3c;
+        }
+
+        .outcome-pending {
+            color: #feca57;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination-info {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-list {
+            list-style: none;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-count {
+            color: white;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .log-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #333;
+            word-break: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logs-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🐼</div>
+                <span class="brand-text">Panda Bank</span>
+            </div>
+            <div class="nav-section">
+                <a href="./dashboard.html" class="nav-btn">← Dashboard</a>
+                <span class="user-name" id="userName">User</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <h1 class="page-title">
+            <span>📊</span>
+            Audit Logs
+        </h1>
+        <p class="page-subtitle">Monitor and review all account activities</p>
+
+        <div class="filter-section">
+            <h2 class="filter-title">
+                <span>🔍</span>
+                Filter Logs
+            </h2>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Start Date</label>
+                    <input type="date" class="filter-input" id="startDate">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">End Date</label>
+                    <input type="date" class="filter-input" id="endDate">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Action</label>
+                    <input type="text" class="filter-input" id="actionFilter" placeholder="Search actions...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Severity</label>
+                    <select class="filter-select" id="severityFilter">
+                        <option value="">All Severity</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Outcome</label>
+                    <select class="filter-select" id="outcomeFilter">
+                        <option value="">All Outcomes</option>
+                        <option value="Success">Success</option>
+                        <option value="Failure">Failure</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">IP Address</label>
+                    <input type="text" class="filter-input" id="ipFilter" placeholder="Filter by IP...">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                <button class="btn btn-primary" onclick="loadLogs()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="exportLogs()">Export Logs</button>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsContainer">
+            <!-- Statistics will be loaded here -->
+        </div>
+
+        <div class="logs-container">
+            <div class="logs-header">
+                <h2 class="section-title">Activity Logs</h2>
+                <div class="pagination-info" id="paginationInfo">Showing 0 results</div>
+            </div>
+            <div id="logsList" class="loading">
+                <div class="empty-icon">📊</div>
+                <h3>Loading activity logs...</h3>
+            </div>
+            <div class="pagination" id="paginationContainer">
+                <!-- Pagination will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Detail Modal -->
+    <div id="logDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Log Details</h2>
+                <button class="close-modal" onclick="closeModal('logDetailModal')">×</button>
+            </div>
+            <div class="log-details" id="logDetailsContent">
+                <!-- Log details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const token = sessionStorage.getItem('authToken');
+        let currentPage = 1;
+        let currentLimit = 20;
+        let totalPages = 1;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!token) {
+                window.location.href = './login.html';
+                return;
+            }
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            document.getElementById('userName').textContent = currentUser.name ? currentUser.name.split(' ')[0] : 'User';
+
+            loadLogs();
+            loadStatistics();
+        });
+
+        async function loadLogs(page = 1) {
+            try {
+                currentPage = page;
+                document.getElementById('logsList').innerHTML = `
+                    <div class="loading">
+                        <div class="empty-icon">📊</div>
+                        <h3>Loading activity logs...</h3>
+                    </div>
+                `;
+
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: currentLimit,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    action: document.getElementById('actionFilter').value,
+                    severity: document.getElementById('severityFilter').value,
+                    outcome: document.getElementById('outcomeFilter').value,
+                    ipAddress: document.getElementById('ipFilter').value
+                });
+
+                const response = await fetch(`${API_BASE_URL}/audit-logs?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch logs');
+                
+                const data = await response.json();
+                renderLogs(data.logs, data.pagination);
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                document.getElementById('logsList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <h3>Error Loading Logs</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/audit-logs/statistics?days=30`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch statistics');
+                
+                const statistics = await response.json();
+                renderStatistics(statistics);
+            } catch (error) {
+                console.error('Error fetching statistics:', error);
+            }
+        }
+
+        function renderLogs(logs, pagination) {
+            const container = document.getElementById('logsList');
+            
+            if (logs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No Logs Found</h3>
+                        <p>No activity logs match your current filters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let logsHTML = `
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                            <th>Severity</th>
+                            <th>Outcome</th>
+                            <th>IP Address</th>
+                            <th>Device</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            logs.forEach(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                const severityClass = `severity-${log.severity.toLowerCase()}`;
+                const outcomeClass = `outcome-${log.outcome.toLowerCase()}`;
+                
+                logsHTML += `
+                    <tr onclick="showLogDetails(${log.log_id})" style="cursor: pointer;">
+                        <td>${timestamp}</td>
+                        <td>${log.action}</td>
+                        <td class="${severityClass}">${log.severity}</td>
+                        <td class="${outcomeClass}">${log.outcome}</td>
+                        <td>${log.ip_address}</td>
+                        <td>${log.device_info || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            logsHTML += '</tbody></table>';
+            container.innerHTML = logsHTML;
+
+            // Update pagination info
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${((pagination.page - 1) * pagination.limit) + 1} to ${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total} results`;
+
+            renderPagination(pagination);
+        }
+
+        function renderPagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+            totalPages = pagination.totalPages;
+            
+            let paginationHTML = '';
+            
+            if (pagination.page > 1) {
+                paginationHTML += `<button class="pagination-btn" onclick="loadLogs(${pagination.page - 1})">Previous</button>`;
+            }
+            
+            // Show page numbers
+            const startPage = Math.max(1, pagination.page - 2);
+            const endPage = Math.min(pagination.totalPages, pagination.page + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="pagination-btn ${i === pagination.page ? 'btn-primary' : ''}" onclick="loadLogs(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            if (pagination.page < pagination.totalPages) {
+                paginationHTML += `<button class="pagination-btn" onclick="loadLogs(${pagination.page + 1})">Next</button>`;
+            }
+            
+            container.innerHTML = paginationHTML;
+        }
+
+        function renderStatistics(stats) {
+            const container = document.getElementById('statsContainer');
+            
+            let statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3 class="stat-title">Activity Summary</h3>
+                        <span>📈</span>
+                    </div>
+                    <div class="stat-value">${stats.byType.reduce((sum, item) => sum + item.count, 0)}</div>
+                    <div>Total Activities (30 days)</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3 class="stat-title">By Outcome</h3>
+                        <span>✅</span>
+                    </div>
+                    <ul class="stat-list">
+            `;
+            
+            stats.byOutcome.forEach(item => {
+                statsHTML += `
+                    <li class="stat-item">
+                        <span class="stat-label">${item.outcome}</span>
+                        <span class="stat-count">${item.count}</span>
+                    </li>
+                `;
+            });
+            
+            statsHTML += `
+                    </ul>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3 class="stat-title">By Severity</h3>
+                        <span>⚠️</span>
+                    </div>
+                    <ul class="stat-list">
+            `;
+            
+            stats.bySeverity.forEach(item => {
+                statsHTML += `
+                    <li class="stat-item">
+                        <span class="stat-label">${item.severity}</span>
+                        <span class="stat-count">${item.count}</span>
+                    </li>
+                `;
+            });
+            
+            statsHTML += `
+                    </ul>
+                </div>
+            `;
+            
+            container.innerHTML = statsHTML;
+        }
+
+        async function showLogDetails(logId) {
+            try {
+                // In a real implementation, you might fetch detailed log info
+                // For now, we'll use the existing logs data
+                const response = await fetch(`${API_BASE_URL}/audit-logs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch logs');
+                
+                const data = await response.json();
+                const log = data.logs.find(l => l.log_id === logId);
+                
+                if (log) {
+                    const timestamp = new Date(log.timestamp).toLocaleString();
+                    
+                    document.getElementById('logDetailsContent').innerHTML = `
+                        <div class="detail-item">
+                            <div class="detail-label">Timestamp</div>
+                            <div class="detail-value">${timestamp}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Action</div>
+                            <div class="detail-value">${log.action}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Severity</div>
+                            <div class="detail-value ${`severity-${log.severity.toLowerCase()}`}">${log.severity}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Outcome</div>
+                            <div class="detail-value ${`outcome-${log.outcome.toLowerCase()}`}">${log.outcome}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">IP Address</div>
+                            <div class="detail-value">${log.ip_address}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Device Info</div>
+                            <div class="detail-value">${log.device_info || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">User</div>
+                            <div class="detail-value">${log.full_name} (${log.email})</div>
+                        </div>
+                        ${log.additional_info ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Additional Info</div>
+                            <div class="detail-value">${log.additional_info}</div>
+                        </div>
+                        ` : ''}
+                    `;
+                    
+                    document.getElementById('logDetailModal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error fetching log details:', error);
+                showNotification('Error loading log details.', 'error');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function clearFilters() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('actionFilter').value = '';
+            document.getElementById('severityFilter').value = '';
+            document.getElementById('outcomeFilter').value = '';
+            document.getElementById('ipFilter').value = '';
+            loadLogs(1);
+        }
+
+        async function exportLogs() {
+            try {
+                const params = new URLSearchParams({
+                    format: 'csv',
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value
+                });
+
+                const response = await fetch(`${API_BASE_URL}/audit-logs/export?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Failed to export logs');
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audit-logs.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showNotification('Logs exported successfully.');
+            } catch (error) {
+                console.error('Error exporting logs:', error);
+                showNotification('Error exporting logs.', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const successGradient = 'linear-gradient(135deg, #00b894, #00a085)';
+            const errorGradient = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? successGradient : errorGradient}; color: white; padding: 15px 20px; border-radius: 10px; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateX(120%); transition: transform 0.3s ease;`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(120%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
