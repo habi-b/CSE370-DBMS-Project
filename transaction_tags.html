@@ -252,6 +252,10 @@
             padding: 60px 20px;
             color: rgba(255, 255, 255, 0.8);
             grid-column: 1/-1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .empty-icon {
@@ -317,6 +321,7 @@
         const token = sessionStorage.getItem('authToken');
         let allTransactions = [];
         let allTags = [];
+        let currentFilterTag = 'all';
 
         document.addEventListener('DOMContentLoaded', function () {
             if (!token) {
@@ -411,6 +416,9 @@
         }
 
         function filterByTag(tag) {
+            // Update current filter
+            currentFilterTag = tag;
+            
             // Remove active class from all tags
             document.querySelectorAll('.tag-item').forEach(item => {
                 item.classList.remove('active');
@@ -496,7 +504,7 @@
         
                 showNotification('✅ Tags updated successfully! 🏷️');
                 fetchAllTags();
-                fetchTransactions();
+                fetchTransactions(currentFilterTag);
             } catch (error) {
                 console.error('Error saving tags:', error);
                 showNotification('❌ Error updating tags.', 'error');
