@@ -3,213 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transaction Tags</title>
+  <title>Panda Bank - Transaction Tagging</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f6f9;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
     .header {
-      background: #2c3e50;
-      color: white;
-      padding: 15px 30px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .header .logo-section {
+    .logo-section {
       display: flex;
       align-items: center;
+      gap: 12px;
     }
-
     .logo {
-      font-size: 1.8em;
-      margin-right: 10px;
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
     }
-
     .brand-text {
-      font-size: 1.2em;
-      font-weight: bold;
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
     }
-
     .nav-section {
       display: flex;
       align-items: center;
+      gap: 15px;
     }
-
     .back-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
       text-decoration: none;
-      margin-right: 20px;
-      font-size: 0.9em;
     }
-
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
     .user-name {
-      font-weight: bold;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
     }
-
     .main-container {
-      padding: 30px;
-      max-width: 1200px;
-      margin: auto;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
     }
-
     .page-title {
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      font-size: 1.8em;
-      margin-bottom: 10px;
+      gap: 12px;
     }
-
-    .page-title span {
-      margin-right: 10px;
-    }
-
     .page-subtitle {
-      color: #7f8c8d;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 16px;
       margin-bottom: 30px;
     }
-
-    .transactions-table {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      padding: 20px;
+    .filter-section {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
-
-    .table-header, .table-row {
-      display: grid;
-      grid-template-columns: 1fr 2fr 1fr 2fr 2fr;
-      padding: 12px 15px;
+    .filter-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
       align-items: center;
-      border-bottom: 1px solid #ecf0f1;
+      gap: 10px;
     }
-
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tag-item {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag-item:hover,
+    .tag-item.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    .delete-tag-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    .delete-tag-btn:hover {
+      background: rgba(231, 76, 60, 0.8);
+      transform: scale(1.1);
+    }
+    .transactions-table {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
     .table-header {
-      font-weight: bold;
-      background: #ecf0f1;
-      border-radius: 6px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px 20px;
+      font-weight: 600;
+      color: white;
     }
-
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      align-items: center;
+    }
     .table-row:last-child {
       border-bottom: none;
     }
-
-    .action-btn {
-      padding: 6px 12px;
+    .credit {
+      color: #00b894;
+    }
+    .debit {
+      color: #e74c3c;
+    }
+    .tag-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+    }
+    .tag-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .save-btn {
+      background: linear-gradient(135deg, #00b894, #00a085);
+      color: white;
       border: none;
-      border-radius: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      margin: 0 5px;
-      font-size: 0.9em;
+      font-size: 12px;
+      transition: all 0.3s ease;
     }
-
-    .btn-add {
-      background: #3498db;
-      color: white;
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
     }
-
-    .btn-add:hover {
-      background: #2980b9;
-    }
-
-    .btn-delete {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .btn-delete:hover {
-      background: #c0392b;
-    }
-
-    .tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .tag {
-      background: #3498db;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.85em;
-    }
-
-    .tag .remove-tag {
-      margin-left: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
     .empty-state {
       text-align: center;
-      padding: 40px;
-      color: #7f8c8d;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.8);
+      grid-column: 1/-1;
     }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.6;
     }
-
-    .modal-content {
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .modal-title {
-      font-size: 1.4em;
-      margin-bottom: 15px;
-    }
-
-    .modal-buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .btn-cancel {
-      background: #7f8c8d;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .btn-cancel:hover {
-      background: #606c76;
-    }
-
-    .btn-confirm {
-      background: #e74c3c;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .btn-confirm:hover {
-      background: #c0392b;
+    @media (max-width: 768px) {
+      .table-header,
+      .table-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
     }
   </style>
 </head>
@@ -229,40 +253,37 @@
 
   <div class="main-container">
     <h1 class="page-title">
-      <span>🏷️</span>
-      Transaction Tags
+      <span>🏷️</span> Transaction Tagging
     </h1>
-    <p class="page-subtitle">Organize your transactions with custom tags</p>
+    <p class="page-subtitle">Organize and categorize your transactions with custom tags</p>
+
+    <div class="filter-section">
+      <h2 class="filter-title">
+        <span>🔍</span> Filter by Tags
+      </h2>
+      <div class="tag-cloud" id="tagCloud">
+        <div class="tag-item active" data-tag="all">All Transactions</div>
+      </div>
+    </div>
 
     <div class="transactions-table">
       <div class="table-header">
-        <div>ID</div>
-        <div>Description</div>
-        <div>Amount</div>
         <div>Date</div>
+        <div>Description</div>
+        <div>Account</div>
+        <div>Amount</div>
         <div>Tags</div>
+        <div>Action</div>
       </div>
       <div id="transactionsList"></div>
-    </div>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div class="modal" id="deleteModal">
-    <div class="modal-content">
-      <h2 class="modal-title">Confirm Deletion</h2>
-      <p>Are you sure you want to delete this tag? This action cannot be undone.</p>
-      <div class="modal-buttons">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" id="confirmDelete">Delete</button>
-      </div>
     </div>
   </div>
 
   <script>
     const API_BASE_URL = 'http://localhost:3000/api';
     const token = sessionStorage.getItem('authToken');
-    let transactions = [];
-    let deleteTagInfo = { transactionId: null, tag: null };
+    let allTransactions = [];
+    let allTags = [];
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!token) {
@@ -274,23 +295,30 @@
       document.getElementById('userName').textContent = currentUser.name ? currentUser.name.split(' ')[0] : 'User';
 
       fetchTransactions();
-
-      document.getElementById('confirmDelete').addEventListener('click', function () {
-        if (deleteTagInfo.transactionId && deleteTagInfo.tag) {
-          deleteTag(deleteTagInfo.transactionId, deleteTagInfo.tag);
-        }
-      });
+      fetchAllTags();
     });
 
-    async function fetchTransactions() {
+    async function fetchTransactions(tag = 'all') {
       try {
-        const response = await fetch(`${API_BASE_URL}/transaction-tags`, {
+        let url = `${API_BASE_URL}/transaction-tags`;
+        if (tag !== 'all') {
+          url = `${API_BASE_URL}/transaction-tags/by-tag/${encodeURIComponent(tag)}`;
+        }
+
+        const response = await fetch(url, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) throw new Error('Failed to fetch transactions');
 
-        transactions = await response.json();
+        const transactions = await response.json();
+        allTransactions = transactions.map(transaction => {
+          const cleanDescription = transaction.description.replace(/\s*\[TAGS:[^\]]+\]\s*/g, '');
+          const tagMatch = transaction.description.match(/\[TAGS:([^\]]+)\]/);
+          const tags = tagMatch ? tagMatch[1] : '';
+          return { ...transaction, description: cleanDescription, tags: tags };
+        });
+
         renderTransactions();
       } catch (error) {
         console.error('Error fetching transactions:', error);
@@ -298,52 +326,108 @@
       }
     }
 
+    async function fetchAllTags() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/transaction-tags/all-tags`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch tags');
+
+        allTags = await response.json();
+        renderTagCloud();
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    }
+
+    function renderTagCloud() {
+      const tagCloud = document.getElementById('tagCloud');
+      tagCloud.innerHTML = '<div class="tag-item active" data-tag="all">All Transactions</div>';
+
+      const allBtn = tagCloud.querySelector('[data-tag="all"]');
+      allBtn.onclick = () => {
+        filterByTag('all');
+      };
+
+      allTags.forEach(tag => {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'tag-item';
+        tagElement.innerHTML = `${tag} <button class="delete-tag-btn" data-tag="${tag}">×</button>`;
+        tagElement.setAttribute('data-tag', tag);
+
+        tagElement.onclick = (e) => {
+          if (!e.target.classList.contains('delete-tag-btn')) {
+            filterByTag(tag);
+          }
+        };
+
+        const deleteBtn = tagElement.querySelector('.delete-tag-btn');
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteTag(tag);
+        };
+
+        tagCloud.appendChild(tagElement);
+      });
+    }
+
+    function filterByTag(tag) {
+      document.querySelectorAll('.tag-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      const selected = document.querySelector(`.tag-item[data-tag="${tag}"]`);
+      if (selected) {
+        selected.classList.add('active');
+      }
+
+      fetchTransactions(tag);
+    }
+
     function renderTransactions() {
       const transactionsList = document.getElementById('transactionsList');
       transactionsList.innerHTML = '';
 
-      if (transactions.length === 0) {
+      if (allTransactions.length === 0) {
         transactionsList.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">🏷️</div>
+            <div class="empty-icon">💸</div>
             <h3>No Transactions Found</h3>
-            <p>You haven't added any tags yet.</p>
-          </div>
-        `;
+            <p>No transactions match your current filter.</p>
+          </div>`;
         return;
       }
 
-      transactions.forEach(transaction => {
+      allTransactions.forEach(transaction => {
         const transactionElement = document.createElement('div');
         transactionElement.className = 'table-row';
-        transactionElement.innerHTML = `
-          <div>${transaction.transaction_id}</div>
-          <div>${transaction.description}</div>
-          <div>${transaction.amount}</div>
-          <div>${new Date(transaction.date).toLocaleDateString()}</div>
-          <div class="tags-container">
-            ${(transaction.tags || []).map(tag => `
-              <span class="tag">${tag} 
-                <span class="remove-tag" onclick="openDeleteModal(${transaction.transaction_id}, '${tag}')">&times;</span>
-              </span>
-            `).join('')}
-          </div>
-        `;
+        transactionElement.innerHTML = createTransactionHTML(transaction);
         transactionsList.appendChild(transactionElement);
       });
     }
 
-    function openDeleteModal(transactionId, tag) {
-      deleteTagInfo = { transactionId, tag };
-      document.getElementById('deleteModal').style.display = 'flex';
+    function createTransactionHTML(transaction) {
+      const transactionDate = new Date(transaction.transaction_date).toLocaleDateString();
+      const amountClass = transaction.transaction_type === 'Credit' ? 'credit' : 'debit';
+      const amountSign = transaction.transaction_type === 'Credit' ? '+' : '-';
+
+      return `
+        <div>${transactionDate}</div>
+        <div>${transaction.description}</div>
+        <div>${transaction.account_number}</div>
+        <div class="${amountClass}">${amountSign} ৳${parseFloat(transaction.amount).toLocaleString()}</div>
+        <div>
+          <input type="text" class="tag-input" value="${transaction.tags || ''}" placeholder="Add tags (comma separated)" data-transaction-id="${transaction.transaction_id}">
+        </div>
+        <div>
+          <button class="save-btn" onclick="saveTags(${transaction.transaction_id})">Save</button>
+        </div>`;
     }
 
-    function closeModal() {
-      deleteTagInfo = { transactionId: null, tag: null };
-      document.getElementById('deleteModal').style.display = 'none';
-    }
+    async function saveTags(transactionId) {
+      const tagInput = document.querySelector(`.tag-input[data-transaction-id="${transactionId}"]`);
+      const tags = tagInput.value.trim();
 
-    async function deleteTag(transactionId, tag) {
       try {
         const response = await fetch(`${API_BASE_URL}/transaction-tags/${transactionId}`, {
           method: 'PUT',
@@ -351,20 +435,47 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ tags: (transactions.find(t => t.transaction_id === transactionId).tags || []).filter(t => t !== tag) })
+          body: JSON.stringify({ tags })
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to delete tag');
+          if (errorData.message && errorData.message.includes('Same tags cannot be saved twice')) {
+            showNotification('❌ Cannot save the same tag twice! Please remove duplicate tags.', 'error');
+          } else {
+            throw new Error(errorData.message || 'Failed to update tags');
+          }
+          return;
         }
 
+        showNotification('✅ Tags updated successfully! 🏷️');
+        fetchAllTags();
+        fetchTransactions();
+      } catch (error) {
+        console.error('Error saving tags:', error);
+        showNotification('❌ Error updating tags.', 'error');
+      }
+    }
+
+    async function deleteTag(tag) {
+      if (!confirm(`Are you sure you want to delete the tag "${tag}"? This will remove it from all transactions.`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/transaction-tags/delete-tag/${encodeURIComponent(tag)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to delete tag');
+
         showNotification('✅ Tag deleted successfully!');
-        closeModal();
+        fetchAllTags();
         fetchTransactions();
       } catch (error) {
         console.error('Error deleting tag:', error);
-        showNotification(`❌ ${error.message}`, 'error');
+        showNotification('❌ Error deleting tag.', 'error');
       }
     }
 
@@ -372,9 +483,23 @@
       const notification = document.createElement('div');
       const successGradient = 'linear-gradient(135deg, #00b894, #00a085)';
       const errorGradient = 'linear-gradient(135deg, #e74c3c, #c0392b)';
-      notification.style.cssText = `position: fixed; top: 20px; right: 20px; background: ${type === 'success' ? successGradient : errorGradient}; color: white; padding: 15px 20px; border-radius: 10px; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateX(120%); transition: transform 0.3s ease;`;
+
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? successGradient : errorGradient};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        z-index: 2000;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        transform: translateX(120%);
+        transition: transform 0.3s ease;`;
+
       notification.textContent = message;
       document.body.appendChild(notification);
+
       setTimeout(() => notification.style.transform = 'translateX(0)', 100);
       setTimeout(() => {
         notification.style.transform = 'translateX(120%)';
