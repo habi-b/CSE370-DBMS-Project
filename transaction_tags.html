@@ -228,6 +228,68 @@
       margin-bottom: 20px;
       opacity: 0.6;
     }
+
+    /* ===== Modal Styles ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      animation: fadeIn 0.3s ease;
+    }
+    .modal h3 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #333;
+    }
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .modal-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .confirm-btn {
+      background: #e74c3c;
+      color: white;
+    }
+    .confirm-btn:hover {
+      background: #c0392b;
+    }
+    .cancel-btn {
+      background: #bdc3c7;
+      color: white;
+    }
+    .cancel-btn:hover {
+      background: #95a5a6;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (max-width: 768px) {
       .table-header,
       .table-row {
@@ -279,11 +341,23 @@
     </div>
   </div>
 
+  <!-- ===== Modal ===== -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <h3 id="modalMessage"></h3>
+      <div class="modal-buttons">
+        <button class="modal-btn confirm-btn" id="confirmDelete">Delete</button>
+        <button class="modal-btn cancel-btn" id="cancelDelete">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE_URL = 'http://localhost:3000/api';
     const token = sessionStorage.getItem('authToken');
     let allTransactions = [];
     let allTags = [];
+    let tagToDelete = null; // store tag for modal
 
     document.addEventListener('DOMContentLoaded', function () {
       if (!token) {
@@ -296,6 +370,10 @@
 
       fetchTransactions();
       fetchAllTags();
+
+      // Modal button actions
+      document.getElementById('confirmDelete').addEventListener('click', confirmDeleteTag);
+      document.getElementById('cancelDelete').addEventListener('click', closeModal);
     });
 
     async function fetchTransactions(tag = 'all') {
@@ -364,7 +442,7 @@
         const deleteBtn = tagElement.querySelector('.delete-tag-btn');
         deleteBtn.onclick = (e) => {
           e.stopPropagation();
-          deleteTag(tag);
+          openModal(tag);
         };
 
         tagCloud.appendChild(tagElement);
@@ -457,13 +535,23 @@
       }
     }
 
-    async function deleteTag(tag) {
-      if (!confirm(`Are you sure you want to delete the tag "${tag}"? This will remove it from all transactions.`)) {
-        return;
-      }
+    function openModal(tag) {
+      tagToDelete = tag;
+      document.getElementById('modalMessage').textContent = 
+        `Are you sure you want to delete this tag "${tag}"? This action cannot be undone.`;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+      tagToDelete = null;
+    }
+
+    async function confirmDeleteTag() {
+      if (!tagToDelete) return;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/transaction-tags/delete-tag/${encodeURIComponent(tag)}`, {
+        const response = await fetch(`${API_BASE_URL}/transaction-tags/delete-tag/${encodeURIComponent(tagToDelete)}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -476,6 +564,8 @@
       } catch (error) {
         console.error('Error deleting tag:', error);
         showNotification('❌ Error deleting tag.', 'error');
+      } finally {
+        closeModal();
       }
     }
 
