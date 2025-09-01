@@ -4,12 +4,15 @@ const db = require('../config/db');
 
 const processScheduledTransfers = async () => {
     // Get today's date in 'YYYY-MM-DD' format, respecting the server's timezone.
-    const today = new Date().toISOString().slice(0, 10);
-    console.log(`[${new Date().toISOString()}] Checking for scheduled transfers due on: ${today}`);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // JS months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
 
     try {
         // Find all schedules that are 'Active' and have a start_date on or before today.
-        // Also, ensure noot to process transfers with an end_date that has already passed.
+        // Also, ensure we don't process transfers with an end_date that has already passed.
         const [schedules] = await db.query(
             `SELECT 
                 st.schedule_id, st.user_id, st.from_account_id, st.amount, st.frequency, st.end_date,
@@ -99,7 +102,7 @@ const initScheduledJobs = () => {
 
     console.log('🕒 Cron job for scheduled transfers has been initialized. Will run daily at 1:00 AM.');
 
-    // processScheduledTransfers(); 
+    processScheduledTransfers();
 };
 
 module.exports = { initScheduledJobs };
