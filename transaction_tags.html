@@ -4,199 +4,150 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Transaction Tagging</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: white;
       margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+      color: white;
     }
-
     header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 15px 30px;
-      background: #142850;
+      background: rgba(0,0,0,0.3);
     }
-
-    header img {
-      width: 40px;
-      margin-right: 10px;
-    }
-
     header h1 {
-      font-size: 20px;
-      margin: 0;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-
     .container {
-      padding: 20px;
+      padding: 30px;
     }
-
-    h2 {
-      font-size: 26px;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      margin-bottom: 20px;
-      color: #ddd;
-    }
-
     .filter-box {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
       margin-bottom: 20px;
     }
-
     .filter-box h3 {
-      margin-top: 0;
+      margin: 0 0 10px 0;
     }
-
-    .tag {
-      display: inline-block;
-      background: #444;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 15px;
-      margin: 5px;
-      font-size: 14px;
+    .tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tag-item {
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
       cursor: pointer;
     }
-
-    .tag .delete-tag {
+    .tag-item.active {
+      background: #00c853;
+    }
+    .tag-item button {
+      background: none;
+      border: none;
       margin-left: 8px;
+      color: red;
       cursor: pointer;
-      color: #e74c3c;
-      font-weight: bold;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
       overflow: hidden;
     }
-
     th, td {
-      padding: 12px;
+      padding: 12px 15px;
       text-align: left;
     }
-
     th {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0,0,0,0.3);
     }
-
-    tr:nth-child(even) {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .amount-positive {
-      color: #2ecc71;
-    }
-
     .amount-negative {
-      color: #e74c3c;
+      color: #ff5252;
     }
-
+    .amount-positive {
+      color: #00e676;
+    }
     input[type="text"] {
       padding: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 180px;
+      border-radius: 8px;
+      border: none;
+      width: 100%;
     }
-
     button.save-btn {
-      background: #27ae60;
-      color: white;
+      background: #00c853;
       border: none;
       padding: 6px 12px;
-      border-radius: 6px;
+      border-radius: 8px;
+      color: white;
       cursor: pointer;
     }
 
-    /* Modal Overlay */
+    /* Modal styles */
     .modal {
+      display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(0, 0, 0, 0.6);
-      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
     }
-
-    .modal[hidden] {
-      display: none;
-    }
-
-    /* Modal Box */
     .modal-content {
-      background: white;
-      color: black;
-      padding: 20px 30px;
-      border-radius: 10px;
-      text-align: center;
+      background: #fff;
+      color: #000;
+      border-radius: 12px;
+      padding: 20px;
       width: 400px;
-      max-width: 90%;
+      text-align: center;
     }
-
     .modal-content h3 {
-      margin-bottom: 10px;
-      font-size: 20px;
+      margin-top: 0;
     }
-
-    .modal-actions {
-      margin-top: 20px;
+    .modal-buttons {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 10px;
+      margin-top: 20px;
     }
-
-    .cancel-btn {
+    .modal-buttons button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .modal-buttons .cancel {
       background: #ccc;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
+      color: #000;
     }
-
-    .delete-btn {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
+    .modal-buttons .delete {
+      background: #e53935;
+      color: #fff;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Panda Bank Logo">
-    <h1>Panda Bank</h1>
+    <h1><i class="fa fa-tag"></i> Transaction Tagging</h1>
+    <a href="/dashboard" style="color:white;">← Back to Dashboard</a>
   </header>
 
   <div class="container">
-    <h2>Transaction Tagging</h2>
-    <p class="subtitle">Organize and categorize your transactions with custom tags</p>
-
     <div class="filter-box">
       <h3>Filter by Tags</h3>
-      <div id="tagList">
-        <!-- Example tags -->
-        <span class="tag">All Transactions</span>
-        <span class="tag">gas <span class="delete-tag" onclick="showDeleteModal('gas')">×</span></span>
-        <span class="tag">interest <span class="delete-tag" onclick="showDeleteModal('interest')">×</span></span>
-        <span class="tag">shopping <span class="delete-tag" onclick="showDeleteModal('shopping')">×</span></span>
+      <div class="tags" id="tagList">
+        <span class="tag-item active" data-tag="all">All Transactions</span>
       </div>
     </div>
 
@@ -211,77 +162,120 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>7/25/2025</td>
-          <td>Interest Credit</td>
-          <td>ACCT-10000001</td>
-          <td class="amount-positive">+200</td>
-          <td><input type="text" placeholder="Add tags (comma separated)"></td>
-          <td><button class="save-btn">Save</button></td>
-        </tr>
-        <tr>
-          <td>7/20/2025</td>
-          <td>Aarong Purchase</td>
-          <td>ACCT-10000001</td>
-          <td class="amount-negative">-2,700</td>
-          <td><input type="text" placeholder="Add tags (comma separated)"></td>
-          <td><button class="save-btn">Save</button></td>
-        </tr>
+      <tbody id="transactionTable">
+        <!-- Transactions will load here -->
       </tbody>
     </table>
   </div>
 
-  <!-- Delete Tag Confirmation Modal -->
-  <div id="deleteTagModal" class="modal" hidden>
+  <!-- Delete Tag Modal -->
+  <div class="modal" id="deleteTagModal">
     <div class="modal-content">
       <h3>Confirm Deletion</h3>
-      <p id="deleteTagMessage">Are you sure you want to delete this tag? This will remove it from all transactions.</p>
-      <div class="modal-actions">
-        <button id="cancelDeleteBtn" class="cancel-btn">Cancel</button>
-        <button id="confirmDeleteBtn" class="delete-btn">Delete</button>
+      <p id="deleteTagMessage">Are you sure you want to delete this tag?</p>
+      <div class="modal-buttons">
+        <button class="cancel" onclick="closeDeleteModal()">Cancel</button>
+        <button class="delete" id="confirmDeleteBtn">Delete</button>
       </div>
     </div>
   </div>
 
   <script>
+    const apiUrl = "/api/attributes";
     let tagToDelete = null;
 
-    function showDeleteModal(tag) {
-      tagToDelete = tag;
-      document.getElementById('deleteTagMessage').textContent =
-        `Are you sure you want to delete "${tag}"? This will remove it from all transactions.`;
-      document.getElementById('deleteTagModal').hidden = false;
+    async function fetchTags() {
+      const response = await fetch(apiUrl + "/all-tags", {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+      const tags = await response.json();
+      const tagList = document.getElementById("tagList");
+      tagList.innerHTML = '<span class="tag-item active" data-tag="all" onclick="filterByTag(\'all\')">All Transactions</span>';
+      tags.forEach(tag => {
+        const span = document.createElement("span");
+        span.className = "tag-item";
+        span.setAttribute("data-tag", tag);
+        span.innerHTML = `${tag} <button onclick="openDeleteModal('${tag}')"><i class="fa fa-times"></i></button>`;
+        span.onclick = () => filterByTag(tag);
+        tagList.appendChild(span);
+      });
     }
 
-    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
-      tagToDelete = null;
-      document.getElementById('deleteTagModal').hidden = true;
-    });
+    function openDeleteModal(tag) {
+      tagToDelete = tag;
+      document.getElementById("deleteTagMessage").innerText = `Are you sure you want to delete the tag "${tag}"? This will remove it from all transactions.`;
+      document.getElementById("deleteTagModal").style.display = "flex";
+    }
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    function closeDeleteModal() {
+      document.getElementById("deleteTagModal").style.display = "none";
+      tagToDelete = null;
+    }
+
+    async function confirmDeleteTag() {
       if (!tagToDelete) return;
-      
-      try {
-        const response = await fetch(`/api/transaction-tags/delete-tag/${encodeURIComponent(tagToDelete)}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
+      await fetch(apiUrl + "/delete-tag/" + tagToDelete, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+      closeDeleteModal();
+      fetchTags();
+      fetchTransactions("all");
+    }
 
-        if (response.ok) {
-          alert(`Tag "${tagToDelete}" deleted successfully.`);
-          location.reload();
-        } else {
-          alert('Error deleting tag.');
-        }
-      } catch (error) {
-        console.error(error);
-        alert('An error occurred while deleting the tag.');
+    document.getElementById("confirmDeleteBtn").addEventListener("click", confirmDeleteTag);
+
+    async function fetchTransactions(tag = "all") {
+      let url = apiUrl;
+      if (tag !== "all") {
+        url += "/by-tag/" + tag;
       }
+      const response = await fetch(url, {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") }
+      });
+      const transactions = await response.json();
+      const tbody = document.getElementById("transactionTable");
+      tbody.innerHTML = "";
+      transactions.forEach(tx => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(tx.date).toLocaleDateString()}</td>
+          <td>${tx.description}</td>
+          <td>${tx.accountNumber}</td>
+          <td class="${tx.amount < 0 ? 'amount-negative' : 'amount-positive'}">${tx.amount}</td>
+          <td><input type="text" value="${tx.tags.join(', ')}"></td>
+          <td><button class="save-btn" onclick="saveTags('${tx._id}', this)">Save</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-      tagToDelete = null;
-      document.getElementById('deleteTagModal').hidden = true;
-    });
+    async function saveTags(transactionId, btn) {
+      const input = btn.closest("tr").querySelector("input");
+      const tags = input.value.split(",").map(tag => tag.trim()).filter(tag => tag);
+      await fetch(apiUrl + "/" + transactionId, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token")
+        },
+        body: JSON.stringify({ tags })
+      });
+      fetchTags();
+      fetchTransactions("all");
+    }
+
+    function filterByTag(tag) {
+      document.querySelectorAll('.tag-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelector(`.tag-item[data-tag="${tag}"]`).classList.add('active');
+      fetchTransactions(tag);
+    }
+
+    // Initial load
+    fetchTags();
+    fetchTransactions("all");
   </script>
 </body>
 </html>
