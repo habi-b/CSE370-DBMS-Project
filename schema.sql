@@ -174,4 +174,17 @@ CREATE TABLE activity_log (
     ip_address VARCHAR(45),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
+
 );
+
+ALTER TABLE activity_log 
+ADD COL severity ENUM('Low', 'Medium', 'High', 'Critical') DEFAULT 'Low',
+ADD COL affected_resource VARCHAR(100),
+ADD COL outcome ENUM('Success', 'Failure', 'Pending') DEFAULT 'Success',
+ADD COL session_id VARCHAR(100),
+ADD COL additional_info TEXT;
+
+-- Create index for better query performance
+CREATE INDEX idx_activity_log_user_date ON activity_log(user_id, timestamp);
+CREATE INDEX idx_activity_log_severity ON activity_log(severity);
+CREATE INDEX idx_activity_log_action ON activity_log(action(50));
