@@ -383,6 +383,7 @@
         function renderTagCloud() {
             const tagCloud = document.getElementById('tagCloud');
             
+            // Keep the "All Transactions" button
             tagCloud.innerHTML = '<div class="tag-item active" data-tag="all">All Transactions</div>';
             
             allTags.forEach(tag => {
@@ -410,13 +411,18 @@
         }
 
         function filterByTag(tag) {
+            // Remove active class from all tags
             document.querySelectorAll('.tag-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            document.querySelector(`.tag-item[data-tag="${tag}"]`).classList.add('active');
-            document.querySelector('.tag-item[data-tag="all"]').classList.add('active');
+            // Add active class to the clicked tag
+            const clickedTag = document.querySelector(`.tag-item[data-tag="${tag}"]`);
+            if (clickedTag) {
+                clickedTag.classList.add('active');
+            }
             
+            // Fetch transactions for the selected tag
             fetchTransactions(tag);
         }
 
@@ -514,7 +520,8 @@
                 
                 showNotification('✅ Tag deleted successfully!');
                 fetchAllTags();
-                fetchTransactions();
+                // After deleting a tag, reset to show all transactions
+                filterByTag('all');
             } catch (error) {
                 console.error('Error deleting tag:', error);
                 showNotification('❌ Error deleting tag.', 'error');
