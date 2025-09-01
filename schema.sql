@@ -184,7 +184,5 @@ ADD COL outcome ENUM('Success', 'Failure', 'Pending') DEFAULT 'Success',
 ADD COL session_id VARCHAR(100),
 ADD COL additional_info TEXT;
 
--- Create index for better query performance
-CREATE INDEX idx_activity_log_user_date ON activity_log(user_id, timestamp);
-CREATE INDEX idx_activity_log_severity ON activity_log(severity);
-CREATE INDEX idx_activity_log_action ON activity_log(action(50));
+
+
