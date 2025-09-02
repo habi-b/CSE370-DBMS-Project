@@ -1,5 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const { initScheduledJobs } = require('./src/services/cronJobs');
+
+require('dotenv').config(); // Loads environment variables from a .env file
+
+// Import routes
+const authRoutes = require('./src/routes/authRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
 const goalsRoutes = require('./src/routes/goalsRoutes');
 const loanRoutes = require('./src/routes/loanRoutes');
@@ -10,10 +16,6 @@ const insightsRoutes = require('./src/routes/insightsRoutes');
 const cardManagementRoutes = require('./src/routes/cardManagementRoutes');
 const walletRoutes = require('./src/routes/multiCurrencyWalletRoutes');
 const auditLogsRoutes = require('./src/routes/auditLogsRoutes');
-require('dotenv').config(); // Loads environment variables from a .env file
-
-// Import routes
-const authRoutes = require('./src/routes/authRoutes');
 
 // Initialize the Express app
 const app = express();
@@ -22,8 +24,7 @@ const app = express();
 app.use(cors()); // Enables Cross-Origin Resource Sharing, allowing front-end to communicate with back-end
 app.use(express.json()); // Parses incoming JSON requests
 
-// Define API routes
-app.use('/api/auth', authRoutes); // All routes starting with /api/auth will be handled by authRoutes
+app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/loans', loanRoutes);
@@ -40,4 +41,5 @@ const PORT = process.env.PORT || 3000;
 // Start the server
 app.listen(PORT, () => {
     console.log(`🐼 Panda Bank server is running on port ${PORT}`);
+    initScheduledJobs();
 });
