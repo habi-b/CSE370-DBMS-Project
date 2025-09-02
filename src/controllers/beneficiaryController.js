@@ -1,5 +1,23 @@
 const db = require('../config/db');
 
+// Helper function to log activities
+const logActivity = async (req, userId, action, severity, outcome, additionalInfo = null) => {
+  try {
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const deviceInfo = req.get('User-Agent');
+    
+    await db.query(
+      `INSERT INTO activity_log 
+       (user_id, action, severity, outcome, ip_address, device_info, additional_info) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [userId, action, severity, outcome, ipAddress, deviceInfo, JSON.stringify(additionalInfo)]
+    );
+  } catch (error) {
+    console.error('Error logging activity:', error);
+  }
+};
+
+
 exports.getBeneficiaries = async (req, res) => {
     const userId = req.user.userId;
     try {
